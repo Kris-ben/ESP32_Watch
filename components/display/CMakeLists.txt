@@ -1,0 +1,16 @@
+idf_component_register(
+    SRCS
+        "st7789v.c"
+        "display_st7789v.c"
+        "cst816t.c"
+        "ui_slider.c"
+        "ui_graphics.c"
+        "board_display.c"
+    INCLUDE_DIRS
+        "include"
+    REQUIRES
+        driver
+        esp_common
+        log
+        heap
+)

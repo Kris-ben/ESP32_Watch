@@ -1,0 +1,15 @@
+#pragma once
+
+// 复制为 ai_chat_config_user.h，并填写自己的配置；该文件名已加入 .gitignore。
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+
+// 大模型接口。SPARK_API_KEY 支持完整的 Bearer 授权值。
+#define SPARK_API_KEY ""
+#define SPARK_URL "https://spark-api-open.xf-yun.com/v1/chat/completions"
+#define SPARK_MODEL "generalv3.5"
+#define SPARK_USER_ID "watch_user"
+
+// 百度语音识别与合成。
+#define BAIDU_API_KEY ""
+#define BAIDU_SECRET_KEY ""

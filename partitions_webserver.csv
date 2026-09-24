@@ -1,0 +1,12 @@
+# Name,   Type, SubType, Offset,   Size,    Flags
+# 注意：nvs 的偏移和大小保持不变，这样升级分区表后用户设置（亮度/音量/闹钟/WiFi）不会丢。
+# html 原来分了 1408K，实际只放了一个约 10K 的 apcfg.html，故缩到 256K，
+# 省下的空间给 factory（程序）分区，避免启用语音功能后放不下。
+nvs,      data, nvs,     0x9000,   0x5000,
+phy_init, data, phy,     0xe000,   0x1000,
+factory,  app,  factory, 0x10000,  0x3F0000,
+img,      data, spiffs,  0x400000, 0x20000,
+html,     data, spiffs,  0x420000, 0x40000,
+otadata,  data, ota,     0x460000, 0x2000,
+ota_0,    app,  ota_0,   0x470000, 0x580000,
+ota_1,    app,  ota_1,   0x9F0000, 0x580000,
