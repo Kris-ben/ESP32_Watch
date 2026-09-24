@@ -7,7 +7,6 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
-#include "app_theme.h"
 #include "lvgl.h"
 #include "gui_guider.h"
 #include "widgets_init.h"
@@ -132,28 +131,28 @@ void screen_Rli_calendar_1_draw_part_begin_event_cb(lv_event_t * e)
     lv_draw_fill_dsc_t * fill_dsc = lv_draw_task_get_fill_dsc(draw_task);
 
     if(base_dsc->id1 < 7) {
-        if(label_dsc) label_dsc->color = lv_color_hex(APP_THEME_MUTED);
+        if(label_dsc) label_dsc->color = lv_color_hex(0x0D3055);
         if(label_dsc) label_dsc->font = &lv_font_ZiTiQuanWeiJunHeiW22_12;
     } else if (lv_buttonmatrix_has_button_ctrl(obj, base_dsc->id1, LV_BUTTONMATRIX_CTRL_DISABLED)) {
-        if(label_dsc) label_dsc->color = lv_color_hex(APP_THEME_MUTED);
+        if(label_dsc) label_dsc->color = lv_color_hex(0xA9A2A2);
         if(label_dsc) label_dsc->font = &lv_font_ZiTiQuanWeiJunHeiW22_12;
         if(fill_dsc) fill_dsc->opa = 255;
-        if(fill_dsc) fill_dsc->color = lv_color_hex(APP_THEME_CARD);
+        if(fill_dsc) fill_dsc->color = lv_color_hex(0xffffff);
     }
     if(lv_buttonmatrix_has_button_ctrl(obj, base_dsc->id1, LV_BUTTONMATRIX_CTRL_CUSTOM_1)) {
-        if(label_dsc) label_dsc->color = lv_color_hex(APP_THEME_MUTED);
+        if(label_dsc) label_dsc->color = lv_color_hex(0x0D3055);
         if(label_dsc) label_dsc->font = &lv_font_ZiTiQuanWeiJunHeiW22_18;
         if(fill_dsc) fill_dsc->opa = 255;
-        if(fill_dsc) fill_dsc->color = lv_color_hex(APP_THEME_ACCENT);
+        if(fill_dsc) fill_dsc->color = lv_color_hex(0x01a2b1);
         if(border_dsc) border_dsc->opa = 255;
         if(border_dsc) border_dsc->width = 1;
-        if(border_dsc) border_dsc->color = lv_color_hex(APP_THEME_BORDER);
+        if(border_dsc) border_dsc->color = lv_color_hex(0xc0c0c0);
     }
     if(lv_buttonmatrix_has_button_ctrl(obj, base_dsc->id1, LV_BUTTONMATRIX_CTRL_CUSTOM_2)) {
-        if(label_dsc) label_dsc->color = lv_color_hex(APP_THEME_MUTED);
+        if(label_dsc) label_dsc->color = lv_color_hex(0x0D3055);
         if(label_dsc) label_dsc->font = &lv_font_ZiTiQuanWeiJunHeiW22_12;
         if(fill_dsc) fill_dsc->opa = 255;
-        if(fill_dsc) fill_dsc->color = lv_color_hex(APP_THEME_ACCENT);
+        if(fill_dsc) fill_dsc->color = lv_color_hex(0x2195f6);
     } else {
     }
 }

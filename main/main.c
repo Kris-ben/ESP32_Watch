@@ -31,6 +31,7 @@
 #include "wifi_connect.h"
 #include "battery_ui.h"
 #include "sd_card_fs.h"
+#include "sd_serial_transfer.h"
 #include "voice_assistant.h"
 
 static const char *TAG = "esp32_s3_watch";
@@ -431,5 +432,8 @@ void app_main(void)
     // 初始化SD卡并列出文件
     if (sd_card_fs_mount() == ESP_OK) {
         sd_card_fs_list_all(NULL, 0);
+        if (sd_serial_transfer_start() != ESP_OK) {
+            ESP_LOGW(TAG, "SD 串口传歌通道启动失败");
+        }
     }
 }

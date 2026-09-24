@@ -7,7 +7,6 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
-#include "app_theme.h"
 #include "lvgl.h"
 #include <stdio.h>
 #include "gui_guider.h"
@@ -29,7 +28,7 @@ void setup_scr_screen_wifi(lv_ui *ui)
 
     //Write style for screen_wifi, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_wifi, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_wifi, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_wifi, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_wifi, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_wifi_list_wifi
@@ -52,11 +51,11 @@ void setup_scr_screen_wifi(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_wifi_list_wifi_main_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_wifi_list_wifi_main_main_default, 5);
     lv_style_set_bg_opa(&style_screen_wifi_list_wifi_main_main_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_wifi_main_main_default, lv_color_hex(APP_THEME_CARD));
+    lv_style_set_bg_color(&style_screen_wifi_list_wifi_main_main_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_wifi_main_main_default, LV_GRAD_DIR_NONE);
     lv_style_set_border_width(&style_screen_wifi_list_wifi_main_main_default, 1);
     lv_style_set_border_opa(&style_screen_wifi_list_wifi_main_main_default, 255);
-    lv_style_set_border_color(&style_screen_wifi_list_wifi_main_main_default, lv_color_hex(APP_THEME_BORDER));
+    lv_style_set_border_color(&style_screen_wifi_list_wifi_main_main_default, lv_color_hex(0xe1e6ee));
     lv_style_set_border_side(&style_screen_wifi_list_wifi_main_main_default, LV_BORDER_SIDE_FULL);
     lv_style_set_radius(&style_screen_wifi_list_wifi_main_main_default, 3);
     lv_style_set_shadow_width(&style_screen_wifi_list_wifi_main_main_default, 0);
@@ -68,7 +67,7 @@ void setup_scr_screen_wifi(lv_ui *ui)
 
     lv_style_set_radius(&style_screen_wifi_list_wifi_main_scrollbar_default, 3);
     lv_style_set_bg_opa(&style_screen_wifi_list_wifi_main_scrollbar_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_wifi_main_scrollbar_default, lv_color_hex(APP_THEME_CARD));
+    lv_style_set_bg_color(&style_screen_wifi_list_wifi_main_scrollbar_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_wifi_main_scrollbar_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_wifi_list_wifi, &style_screen_wifi_list_wifi_main_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
@@ -81,12 +80,12 @@ void setup_scr_screen_wifi(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_wifi_list_wifi_extra_btns_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_wifi_list_wifi_extra_btns_main_default, 5);
     lv_style_set_border_width(&style_screen_wifi_list_wifi_extra_btns_main_default, 0);
-    lv_style_set_text_color(&style_screen_wifi_list_wifi_extra_btns_main_default, lv_color_hex(APP_THEME_MUTED));
+    lv_style_set_text_color(&style_screen_wifi_list_wifi_extra_btns_main_default, lv_color_hex(0x0D3055));
     lv_style_set_text_font(&style_screen_wifi_list_wifi_extra_btns_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_18);
     lv_style_set_text_opa(&style_screen_wifi_list_wifi_extra_btns_main_default, 255);
     lv_style_set_radius(&style_screen_wifi_list_wifi_extra_btns_main_default, 3);
     lv_style_set_bg_opa(&style_screen_wifi_list_wifi_extra_btns_main_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_wifi_extra_btns_main_default, lv_color_hex(APP_THEME_CARD));
+    lv_style_set_bg_color(&style_screen_wifi_list_wifi_extra_btns_main_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_wifi_extra_btns_main_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_wifi_list_wifi_item4, &style_screen_wifi_list_wifi_extra_btns_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_add_style(ui->screen_wifi_list_wifi_item3, &style_screen_wifi_list_wifi_extra_btns_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -103,13 +102,13 @@ void setup_scr_screen_wifi(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_wifi_list_wifi_extra_texts_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_wifi_list_wifi_extra_texts_main_default, 5);
     lv_style_set_border_width(&style_screen_wifi_list_wifi_extra_texts_main_default, 0);
-    lv_style_set_text_color(&style_screen_wifi_list_wifi_extra_texts_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_text_color(&style_screen_wifi_list_wifi_extra_texts_main_default, lv_color_hex(0x000000));
     lv_style_set_text_font(&style_screen_wifi_list_wifi_extra_texts_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_24);
     lv_style_set_text_opa(&style_screen_wifi_list_wifi_extra_texts_main_default, 255);
     lv_style_set_radius(&style_screen_wifi_list_wifi_extra_texts_main_default, 3);
     lv_style_set_transform_width(&style_screen_wifi_list_wifi_extra_texts_main_default, 0);
     lv_style_set_bg_opa(&style_screen_wifi_list_wifi_extra_texts_main_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_wifi_extra_texts_main_default, lv_color_hex(APP_THEME_CARD));
+    lv_style_set_bg_color(&style_screen_wifi_list_wifi_extra_texts_main_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_wifi_extra_texts_main_default, LV_GRAD_DIR_NONE);
 
     //Write codes screen_wifi_btn_scanf
@@ -125,12 +124,12 @@ void setup_scr_screen_wifi(lv_ui *ui)
 
     //Write style for screen_wifi_btn_scanf, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_wifi_btn_scanf, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_wifi_btn_scanf, lv_color_hex(APP_THEME_ACCENT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_wifi_btn_scanf, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_wifi_btn_scanf, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_wifi_btn_scanf, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_wifi_btn_scanf, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_wifi_btn_scanf, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_wifi_btn_scanf, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_wifi_btn_scanf, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_wifi_btn_scanf, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_wifi_btn_scanf, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_wifi_btn_scanf, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -148,13 +147,13 @@ void setup_scr_screen_wifi(lv_ui *ui)
 
     //Write style for screen_wifi_digital_clock_time, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->screen_wifi_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_wifi_digital_clock_time, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_wifi_digital_clock_time, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_wifi_digital_clock_time, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_wifi_digital_clock_time, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_wifi_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_wifi_digital_clock_time, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_wifi_digital_clock_time, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_wifi_digital_clock_time, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_wifi_digital_clock_time, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_wifi_digital_clock_time, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->screen_wifi_digital_clock_time, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->screen_wifi_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -188,12 +187,12 @@ void setup_scr_screen_wifi(lv_ui *ui)
 
     //Write style for screen_wifi_btn_return, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_wifi_btn_return, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_wifi_btn_return, lv_color_hex(APP_THEME_ACCENT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_wifi_btn_return, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_wifi_btn_return, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_wifi_btn_return, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_wifi_btn_return, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_wifi_btn_return, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_wifi_btn_return, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_wifi_btn_return, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_wifi_btn_return, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_wifi_btn_return, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_wifi_btn_return, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -214,11 +213,11 @@ void setup_scr_screen_wifi(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_wifi_list_battery_main_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_wifi_list_battery_main_main_default, 5);
     lv_style_set_bg_opa(&style_screen_wifi_list_battery_main_main_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_battery_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_wifi_list_battery_main_main_default, lv_color_hex(0x050505));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_battery_main_main_default, LV_GRAD_DIR_NONE);
     lv_style_set_border_width(&style_screen_wifi_list_battery_main_main_default, 1);
     lv_style_set_border_opa(&style_screen_wifi_list_battery_main_main_default, 255);
-    lv_style_set_border_color(&style_screen_wifi_list_battery_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_border_color(&style_screen_wifi_list_battery_main_main_default, lv_color_hex(0x000000));
     lv_style_set_border_side(&style_screen_wifi_list_battery_main_main_default, LV_BORDER_SIDE_FULL);
     lv_style_set_radius(&style_screen_wifi_list_battery_main_main_default, 3);
     lv_style_set_shadow_width(&style_screen_wifi_list_battery_main_main_default, 0);
@@ -230,7 +229,7 @@ void setup_scr_screen_wifi(lv_ui *ui)
 
     lv_style_set_radius(&style_screen_wifi_list_battery_main_scrollbar_default, 3);
     lv_style_set_bg_opa(&style_screen_wifi_list_battery_main_scrollbar_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_battery_main_scrollbar_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_wifi_list_battery_main_scrollbar_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_battery_main_scrollbar_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_wifi_list_battery, &style_screen_wifi_list_battery_main_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
@@ -243,12 +242,12 @@ void setup_scr_screen_wifi(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_wifi_list_battery_extra_btns_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_wifi_list_battery_extra_btns_main_default, 5);
     lv_style_set_border_width(&style_screen_wifi_list_battery_extra_btns_main_default, 0);
-    lv_style_set_text_color(&style_screen_wifi_list_battery_extra_btns_main_default, lv_color_hex(APP_THEME_TEXT));
+    lv_style_set_text_color(&style_screen_wifi_list_battery_extra_btns_main_default, lv_color_hex(0xfbfbfb));
     lv_style_set_text_font(&style_screen_wifi_list_battery_extra_btns_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_12);
     lv_style_set_text_opa(&style_screen_wifi_list_battery_extra_btns_main_default, 255);
     lv_style_set_radius(&style_screen_wifi_list_battery_extra_btns_main_default, 3);
     lv_style_set_bg_opa(&style_screen_wifi_list_battery_extra_btns_main_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_battery_extra_btns_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_wifi_list_battery_extra_btns_main_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_battery_extra_btns_main_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_wifi_list_battery_item0, &style_screen_wifi_list_battery_extra_btns_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
 
@@ -261,13 +260,13 @@ void setup_scr_screen_wifi(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_wifi_list_battery_extra_texts_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_wifi_list_battery_extra_texts_main_default, 5);
     lv_style_set_border_width(&style_screen_wifi_list_battery_extra_texts_main_default, 0);
-    lv_style_set_text_color(&style_screen_wifi_list_battery_extra_texts_main_default, lv_color_hex(APP_THEME_TEXT));
+    lv_style_set_text_color(&style_screen_wifi_list_battery_extra_texts_main_default, lv_color_hex(0xf9f9f9));
     lv_style_set_text_font(&style_screen_wifi_list_battery_extra_texts_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_12);
     lv_style_set_text_opa(&style_screen_wifi_list_battery_extra_texts_main_default, 255);
     lv_style_set_radius(&style_screen_wifi_list_battery_extra_texts_main_default, 3);
     lv_style_set_transform_width(&style_screen_wifi_list_battery_extra_texts_main_default, 0);
     lv_style_set_bg_opa(&style_screen_wifi_list_battery_extra_texts_main_default, 255);
-    lv_style_set_bg_color(&style_screen_wifi_list_battery_extra_texts_main_default, lv_color_hex(APP_THEME_CARD));
+    lv_style_set_bg_color(&style_screen_wifi_list_battery_extra_texts_main_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_screen_wifi_list_battery_extra_texts_main_default, LV_GRAD_DIR_NONE);
 
     //The custom code of screen_wifi.

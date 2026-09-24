@@ -59,6 +59,7 @@ typedef enum {
  */
 typedef enum {
     VOICE_DIALOG_EVENT_WAKEUP,           /*!< 唤醒事件 */
+    VOICE_DIALOG_EVENT_SESSION_END,      /*!< 连续对话结束，返回唤醒词监听 */
     VOICE_DIALOG_EVENT_RECORD_START,     /*!< 开始录音 */
     VOICE_DIALOG_EVENT_RECORD_END,       /*!< 录音结束 */
     VOICE_DIALOG_EVENT_ASR_RESULT,       /*!< ASR识别结果 */

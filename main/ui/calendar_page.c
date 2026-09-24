@@ -1,4 +1,3 @@
-#include "app_theme.h"
 #include "calendar_page.h"
 
 #include <stdio.h>
@@ -7,11 +6,11 @@
 #include "guider_customer_fonts.h"
 #include "lvgl.h"
 
-#define CAL_BG       APP_THEME_BG
-#define CAL_TEXT     APP_THEME_TEXT
-#define CAL_MUTED    APP_THEME_MUTED
-#define CAL_CARD     APP_THEME_CARD
-#define CAL_ACCENT   APP_THEME_ACCENT
+#define CAL_BG       0x090f1a
+#define CAL_TEXT     0xf1f6ff
+#define CAL_MUTED    0x9bb0c9
+#define CAL_CARD     0x172539
+#define CAL_ACCENT   0x2777ca
 
 typedef struct calendar_page calendar_page_t;
 
@@ -148,9 +147,9 @@ static void render(calendar_page_t *page)
         lv_obj_set_style_bg_color(cell->button,
             lv_color_hex(selected ? CAL_ACCENT : CAL_BG), 0);
         lv_obj_set_style_border_width(cell->button, today ? 2 : 0, 0);
-        lv_obj_set_style_border_color(cell->button, lv_color_hex(APP_THEME_ACCENT), 0);
+        lv_obj_set_style_border_color(cell->button, lv_color_hex(0x65d5c0), 0);
         lv_obj_set_style_text_color(cell->label,
-            lv_color_hex(selected ? APP_THEME_ON_ACCENT : i % 7 >= 5 ? APP_THEME_ACCENT : CAL_TEXT), 0);
+            lv_color_hex(selected ? 0xffffff : i % 7 >= 5 ? 0xe0c093 : CAL_TEXT), 0);
     }
 
     if (page->selected_day == 0) {
@@ -229,7 +228,7 @@ void calendar_page_init(lv_ui *ui)
                                  "日历", true, CAL_TEXT);
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_LEFT, 0);
     lv_obj_t *today = make_button(page->screen, 174, 8, 56, 30, CAL_CARD);
-    make_label(today, 0, 7, 56, 18, "回今天", false, APP_THEME_ACCENT);
+    make_label(today, 0, 7, 56, 18, "回今天", false, 0x83d9c8);
     lv_obj_add_event_cb(today, today_clicked_cb, LV_EVENT_CLICKED, page);
 
     lv_obj_t *previous = make_button(page->screen, 10, 46, 34, 36, CAL_CARD);
@@ -245,7 +244,7 @@ void calendar_page_init(lv_ui *ui)
     for (int column = 0; column < 7; ++column) {
         make_label(page->screen, 8 + column * 32, 88, 32, 18,
                    s_weekdays[column], false,
-                   column >= 5 ? APP_THEME_ACCENT : CAL_MUTED);
+                   column >= 5 ? 0xd3aa79 : CAL_MUTED);
     }
     for (int i = 0; i < 42; ++i) {
         calendar_cell_t *cell = &page->cells[i];

@@ -12,7 +12,6 @@
 #include "gui_guider.h"
 #include "widgets_init.h"
 #include "quick_settings_page.h"
-#include "app_theme.h"
 
 void ui_init_style(lv_style_t * style)
 {
@@ -25,8 +24,6 @@ void ui_init_style(lv_style_t * style)
 void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, bool * old_scr_del, ui_setup_scr_t setup_scr,
                            lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay, bool is_clean, bool auto_del)
 {
-    (void)anim_type;
-    (void)time;
     (void)delay;
     (void)is_clean;
 
@@ -36,14 +33,28 @@ void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, boo
         gg_edata_task_clear(lv_screen_active());
     }
 #endif
+    // 首页保留在内存中，隐藏期间时钟、WiFi 和电池状态仍会更新；返回时不再显示新建页面的占位值。
+    bool keep_home = lv_screen_active() == ui->screen_home && new_scr != &ui->screen_home;
     if (new_scr_del) {
         setup_scr(ui);
     }
-    // 延后 1 ms 执行无动画切换，等当前触摸事件回调结束后再删除旧页面。
-    lv_screen_load_anim(*new_scr, LV_SCR_LOAD_ANIM_NONE, 0, 1, auto_del);
+    if (new_scr == &ui->screen_home) {
+        ui->screen_home_del = false;
+    }
+    bool delete_old = auto_del && !keep_home;
+    // 页面不移动；旧页先隐藏到纯色底层，新页再淡入，避免拉伸拖影和两页叠影。
+    uint32_t transition_ms = anim_type == LV_SCR_LOAD_ANIM_NONE ? 0 : (time > 120 ? 120 : time);
+    lv_obj_t *old_scr = lv_screen_active();
+    // 延后 1 ms 开始，等当前触摸事件回调结束后再切换或删除旧页面。
+    lv_screen_load_anim(*new_scr,
+                        transition_ms ? LV_SCR_LOAD_ANIM_FADE_ON : LV_SCR_LOAD_ANIM_NONE,
+                        transition_ms, 1, delete_old);
+    if (transition_ms > 0 && old_scr && old_scr != *new_scr && lv_obj_is_valid(old_scr)) {
+        lv_obj_set_style_opa(old_scr, LV_OPA_TRANSP, 0);
+    }
     // 兼容调用方传 NULL 的情况：往空指针写会让芯片直接异常重启（黑屏）
     if (old_scr_del) {
-        *old_scr_del = auto_del;
+        *old_scr_del = delete_old;
     }
 }
 
@@ -96,15 +107,17 @@ void init_scr_del_flag(lv_ui *ui)
 void setup_bottom_layer(void)
 {
     lv_theme_apply(lv_layer_bottom());
+    lv_obj_set_style_bg_color(lv_layer_bottom(), lv_color_hex(0x010101), 0);
+    lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_COVER, 0);
 }
 
 void setup_ui(lv_ui *ui)
 {
-    app_theme_init();
     setup_bottom_layer();
     init_scr_del_flag(ui);
     init_keyboard(ui);
     setup_scr_screen_home(ui);
+    ui->screen_home_del = false;
     lv_screen_load(ui->screen_home);
     quick_settings_page_bind(ui);
 }

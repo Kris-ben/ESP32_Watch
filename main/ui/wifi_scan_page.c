@@ -1,4 +1,3 @@
-#include "app_theme.h"
 #include "wifi_scan_page.h"
 
 #include "esp_wifi.h"
@@ -30,7 +29,7 @@ static void refresh_connection_status(wifi_scan_page_t *page)
     bool connected = wifi_connect_is_connected();
     lv_label_set_text(page->status, connected ? "已连接" : "未连接");
     lv_obj_set_style_text_color(page->status,
-                                lv_color_hex(connected ? APP_THEME_ACCENT : APP_THEME_MUTED), 0);
+                                lv_color_hex(connected ? 0x75dfbe : 0xb9cde2), 0);
 }
 
 static void status_timer_cb(lv_timer_t *timer)
@@ -82,9 +81,9 @@ void wifi_scan_page_on_finished(lv_ui *ui, int count)
                        strcmp(wifi_connect_get_scanned_ssid(i),
                               (const char *)connected_ap.ssid) == 0;
         lv_obj_set_style_bg_color(items[i],
-                                  lv_color_hex(current ? APP_THEME_RAISED : APP_THEME_CARD), 0);
+                                  lv_color_hex(current ? 0x1b3844 : 0x1a2431), 0);
         lv_obj_set_style_border_width(items[i], current ? 1 : 0, 0);
-        if (current) lv_obj_set_style_border_color(items[i], lv_color_hex(APP_THEME_BORDER), 0);
+        if (current) lv_obj_set_style_border_color(items[i], lv_color_hex(0x368b94), 0);
     }
 
     if (count > 0) {
@@ -104,7 +103,7 @@ void wifi_scan_page_init(lv_ui *ui)
     if (!ui || !ui->screen_wifi) return;
 
     lv_obj_t *screen = ui->screen_wifi;
-    lv_obj_set_style_bg_color(screen, lv_color_hex(APP_THEME_BG), 0);
+    lv_obj_set_style_bg_color(screen, lv_color_hex(0x090d15), 0);
     lv_obj_remove_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(ui->screen_wifi_digital_clock_time, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui->screen_wifi_img_wi_close, LV_OBJ_FLAG_HIDDEN);
@@ -114,7 +113,7 @@ void wifi_scan_page_init(lv_ui *ui)
     lv_obj_set_pos(title, 14, 11);
     lv_label_set_text(title, "WiFi 网络");
     lv_obj_set_style_text_font(title, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-    lv_obj_set_style_text_color(title, lv_color_hex(APP_THEME_TEXT), 0);
+    lv_obj_set_style_text_color(title, lv_color_hex(0xffffff), 0);
 
     lv_obj_t *status = lv_label_create(screen);
     lv_obj_set_pos(status, 166, 18);
@@ -139,7 +138,7 @@ void wifi_scan_page_init(lv_ui *ui)
     for (int i = 0; i < WIFI_LIST_MAX_COUNT; ++i) {
         lv_obj_t *item = items[i];
         lv_obj_set_height(item, 32);
-        lv_obj_set_style_bg_color(item, lv_color_hex(APP_THEME_CARD), 0);
+        lv_obj_set_style_bg_color(item, lv_color_hex(0x1a2431), 0);
         lv_obj_set_style_radius(item, 9, 0);
         lv_obj_set_style_border_width(item, 0, 0);
         lv_obj_set_style_pad_left(item, 12, 0);
@@ -147,7 +146,7 @@ void wifi_scan_page_init(lv_ui *ui)
         lv_obj_set_style_pad_top(item, 2, 0);
         lv_obj_set_style_pad_bottom(item, 2, 0);
         lv_obj_set_style_text_font(item, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-        lv_obj_set_style_text_color(item, lv_color_hex(APP_THEME_TEXT), 0);
+        lv_obj_set_style_text_color(item, lv_color_hex(0xffffff), 0);
         uint32_t children = lv_obj_get_child_count(item);
         for (uint32_t child = 0; child < children; ++child) {
             lv_obj_t *part = lv_obj_get_child(item, child);
@@ -156,7 +155,7 @@ void wifi_scan_page_init(lv_ui *ui)
                 lv_obj_add_flag(part, LV_OBJ_FLAG_HIDDEN);
             } else if (lv_obj_check_type(part, &lv_label_class)) {
                 lv_obj_set_style_text_font(part, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-                lv_obj_set_style_text_color(part, lv_color_hex(APP_THEME_TEXT), 0);
+                lv_obj_set_style_text_color(part, lv_color_hex(0xffffff), 0);
                 lv_label_set_long_mode(part, LV_LABEL_LONG_DOT);
             }
         }
@@ -167,7 +166,7 @@ void wifi_scan_page_init(lv_ui *ui)
     lv_obj_t *empty_box = lv_obj_create(screen);
     lv_obj_set_pos(empty_box, 10, 47);
     lv_obj_set_size(empty_box, 220, 180);
-    lv_obj_set_style_bg_color(empty_box, lv_color_hex(APP_THEME_SURFACE), 0);
+    lv_obj_set_style_bg_color(empty_box, lv_color_hex(0x121b28), 0);
     lv_obj_set_style_border_width(empty_box, 0, 0);
     lv_obj_set_style_radius(empty_box, 11, 0);
     lv_obj_remove_flag(empty_box, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
@@ -183,29 +182,27 @@ void wifi_scan_page_init(lv_ui *ui)
     lv_label_set_text(empty_text, "点击下方按钮扫描");
     lv_obj_set_style_text_align(empty_text, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(empty_text, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-    lv_obj_set_style_text_color(empty_text, lv_color_hex(APP_THEME_TEXT), 0);
+    lv_obj_set_style_text_color(empty_text, lv_color_hex(0xe5edf6), 0);
 
     lv_obj_t *button = ui->screen_wifi_btn_scanf;
     lv_obj_set_pos(button, 12, 235);
     lv_obj_set_size(button, 130, 39);
     lv_obj_set_style_radius(button, 10, 0);
-    lv_obj_set_style_bg_color(button, lv_color_hex(APP_THEME_ACCENT), 0);
+    lv_obj_set_style_bg_color(button, lv_color_hex(0x247fda), 0);
     lv_label_set_text(ui->screen_wifi_btn_scanf_label, "重新扫描");
     lv_obj_set_style_text_font(ui->screen_wifi_btn_scanf_label,
                                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-    lv_obj_set_style_text_color(ui->screen_wifi_btn_scanf_label,
-                                lv_color_hex(APP_THEME_ON_ACCENT), 0);
 
     lv_obj_t *upgrade = lv_button_create(screen);
     lv_obj_set_pos(upgrade, 150, 235);
     lv_obj_set_size(upgrade, 78, 39);
     lv_obj_set_style_radius(upgrade, 10, 0);
-    lv_obj_set_style_bg_color(upgrade, lv_color_hex(APP_THEME_CARD), 0);
+    lv_obj_set_style_bg_color(upgrade, lv_color_hex(0x263d55), 0);
     lv_obj_t *upgrade_text = lv_label_create(upgrade);
     lv_label_set_text(upgrade_text, "升级");
     lv_obj_set_style_text_font(upgrade_text,
                                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-    lv_obj_set_style_text_color(upgrade_text, lv_color_hex(APP_THEME_TEXT), 0);
+    lv_obj_set_style_text_color(upgrade_text, lv_color_hex(0xffffff), 0);
     lv_obj_center(upgrade_text);
     lv_obj_add_event_cb(upgrade, upgrade_clicked_cb, LV_EVENT_CLICKED, NULL);
 

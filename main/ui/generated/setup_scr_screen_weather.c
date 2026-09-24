@@ -7,7 +7,6 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
-#include "app_theme.h"
 #include "lvgl.h"
 #include <stdio.h>
 #include "gui_guider.h"
@@ -28,7 +27,7 @@ void setup_scr_screen_weather(lv_ui *ui)
 
     //Write style for screen_weather, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_weather, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_weather, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_weather, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_weather, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_weather_label_later
@@ -41,7 +40,7 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_later, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_later, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_later, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_later, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_later, lv_color_hex(0xf5f5f5), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_later, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_later, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_later, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -64,7 +63,7 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_tomorrow, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_tomorrow, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_tomorrow, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_tomorrow, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_tomorrow, lv_color_hex(0xf5f5f5), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_tomorrow, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_tomorrow, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_tomorrow, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -87,7 +86,7 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_today, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_today, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_today, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_today, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_today, lv_color_hex(0xf5f5f5), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_today, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_today, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_today, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -110,7 +109,7 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_later_temp, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_later_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_later_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_later_temp, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_later_temp, lv_color_hex(0xf5f5f5), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_later_temp, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_later_temp, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_later_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -133,7 +132,7 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_tomorrow_temp, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_tomorrow_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_tomorrow_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_tomorrow_temp, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_tomorrow_temp, lv_color_hex(0xf5f5f5), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_tomorrow_temp, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_tomorrow_temp, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_tomorrow_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -156,7 +155,7 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_today_temp, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_today_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_today_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_today_temp, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_today_temp, lv_color_hex(0xf5f5f5), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_today_temp, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_today_temp, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_today_temp, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -218,14 +217,14 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_today1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_today1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_today1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_today1, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_today1, lv_color_hex(0xf1ebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_today1, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_today1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_today1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->screen_weather_label_today1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_weather_label_today1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_weather_label_today1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_weather_label_today1, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_weather_label_today1, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_weather_label_today1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->screen_weather_label_today1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->screen_weather_label_today1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -243,14 +242,14 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_tomorrow2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_tomorrow2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_tomorrow2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_tomorrow2, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_tomorrow2, lv_color_hex(0xf1ebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_tomorrow2, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_tomorrow2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_tomorrow2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->screen_weather_label_tomorrow2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_weather_label_tomorrow2, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_weather_label_tomorrow2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_weather_label_tomorrow2, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_weather_label_tomorrow2, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_weather_label_tomorrow2, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->screen_weather_label_tomorrow2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->screen_weather_label_tomorrow2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -268,14 +267,14 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_later2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_later2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_later2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_later2, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_later2, lv_color_hex(0xf1ebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_later2, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_later2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_later2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->screen_weather_label_later2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_weather_label_later2, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_weather_label_later2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_weather_label_later2, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_weather_label_later2, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_weather_label_later2, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->screen_weather_label_later2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->screen_weather_label_later2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -296,12 +295,12 @@ void setup_scr_screen_weather(lv_ui *ui)
 
     //Write style for screen_weather_btn_return, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_weather_btn_return, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_weather_btn_return, lv_color_hex(APP_THEME_ACCENT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_weather_btn_return, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_weather_btn_return, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_weather_btn_return, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_btn_return, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_weather_btn_return, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_btn_return, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_btn_return, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_btn_return, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_btn_return, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_weather_btn_return, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -316,7 +315,7 @@ void setup_scr_screen_weather(lv_ui *ui)
     //Write style for screen_weather_label_city, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_weather_label_city, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_label_city, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_weather_label_city, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_label_city, lv_color_hex(0xf5f5f5), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_label_city, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_label_city, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_label_city, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -358,11 +357,11 @@ void setup_scr_screen_weather(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_weather_list_bettery_main_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_weather_list_bettery_main_main_default, 5);
     lv_style_set_bg_opa(&style_screen_weather_list_bettery_main_main_default, 255);
-    lv_style_set_bg_color(&style_screen_weather_list_bettery_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_weather_list_bettery_main_main_default, lv_color_hex(0x050505));
     lv_style_set_bg_grad_dir(&style_screen_weather_list_bettery_main_main_default, LV_GRAD_DIR_NONE);
     lv_style_set_border_width(&style_screen_weather_list_bettery_main_main_default, 1);
     lv_style_set_border_opa(&style_screen_weather_list_bettery_main_main_default, 255);
-    lv_style_set_border_color(&style_screen_weather_list_bettery_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_border_color(&style_screen_weather_list_bettery_main_main_default, lv_color_hex(0x000000));
     lv_style_set_border_side(&style_screen_weather_list_bettery_main_main_default, LV_BORDER_SIDE_FULL);
     lv_style_set_radius(&style_screen_weather_list_bettery_main_main_default, 3);
     lv_style_set_shadow_width(&style_screen_weather_list_bettery_main_main_default, 0);
@@ -374,7 +373,7 @@ void setup_scr_screen_weather(lv_ui *ui)
 
     lv_style_set_radius(&style_screen_weather_list_bettery_main_scrollbar_default, 3);
     lv_style_set_bg_opa(&style_screen_weather_list_bettery_main_scrollbar_default, 255);
-    lv_style_set_bg_color(&style_screen_weather_list_bettery_main_scrollbar_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_weather_list_bettery_main_scrollbar_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_weather_list_bettery_main_scrollbar_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_weather_list_bettery, &style_screen_weather_list_bettery_main_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
@@ -387,12 +386,12 @@ void setup_scr_screen_weather(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_weather_list_bettery_extra_btns_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_weather_list_bettery_extra_btns_main_default, 5);
     lv_style_set_border_width(&style_screen_weather_list_bettery_extra_btns_main_default, 0);
-    lv_style_set_text_color(&style_screen_weather_list_bettery_extra_btns_main_default, lv_color_hex(APP_THEME_TEXT));
+    lv_style_set_text_color(&style_screen_weather_list_bettery_extra_btns_main_default, lv_color_hex(0xfbfbfb));
     lv_style_set_text_font(&style_screen_weather_list_bettery_extra_btns_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_12);
     lv_style_set_text_opa(&style_screen_weather_list_bettery_extra_btns_main_default, 255);
     lv_style_set_radius(&style_screen_weather_list_bettery_extra_btns_main_default, 3);
     lv_style_set_bg_opa(&style_screen_weather_list_bettery_extra_btns_main_default, 255);
-    lv_style_set_bg_color(&style_screen_weather_list_bettery_extra_btns_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_weather_list_bettery_extra_btns_main_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_weather_list_bettery_extra_btns_main_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_weather_list_bettery_item0, &style_screen_weather_list_bettery_extra_btns_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
 
@@ -405,13 +404,13 @@ void setup_scr_screen_weather(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_weather_list_bettery_extra_texts_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_weather_list_bettery_extra_texts_main_default, 5);
     lv_style_set_border_width(&style_screen_weather_list_bettery_extra_texts_main_default, 0);
-    lv_style_set_text_color(&style_screen_weather_list_bettery_extra_texts_main_default, lv_color_hex(APP_THEME_TEXT));
+    lv_style_set_text_color(&style_screen_weather_list_bettery_extra_texts_main_default, lv_color_hex(0xf9f9f9));
     lv_style_set_text_font(&style_screen_weather_list_bettery_extra_texts_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_12);
     lv_style_set_text_opa(&style_screen_weather_list_bettery_extra_texts_main_default, 255);
     lv_style_set_radius(&style_screen_weather_list_bettery_extra_texts_main_default, 3);
     lv_style_set_transform_width(&style_screen_weather_list_bettery_extra_texts_main_default, 0);
     lv_style_set_bg_opa(&style_screen_weather_list_bettery_extra_texts_main_default, 255);
-    lv_style_set_bg_color(&style_screen_weather_list_bettery_extra_texts_main_default, lv_color_hex(APP_THEME_CARD));
+    lv_style_set_bg_color(&style_screen_weather_list_bettery_extra_texts_main_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_screen_weather_list_bettery_extra_texts_main_default, LV_GRAD_DIR_NONE);
 
     //Write codes screen_weather_img_wificlose
@@ -438,13 +437,13 @@ void setup_scr_screen_weather(lv_ui *ui)
     lv_obj_add_event_cb(ui->screen_weather_datetext_1, screen_weather_datetext_1_event_handler, LV_EVENT_ALL, NULL);
 
     //Write style for screen_weather_datetext_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_text_color(ui->screen_weather_datetext_1, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_weather_datetext_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_weather_datetext_1, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_weather_datetext_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_weather_datetext_1, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_weather_datetext_1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_weather_datetext_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_weather_datetext_1, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_weather_datetext_1, lv_color_hex(0x030303), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_weather_datetext_1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_weather_datetext_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_weather_datetext_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);

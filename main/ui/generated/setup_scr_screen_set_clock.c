@@ -7,7 +7,6 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
-#include "app_theme.h"
 #include "lvgl.h"
 #include <stdio.h>
 #include "gui_guider.h"
@@ -26,7 +25,7 @@ void setup_scr_screen_set_clock(lv_ui *ui)
 
     //Write style for screen_set_clock, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_set_clock, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_clock, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_clock, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_clock, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_set_clock_roller_hour
@@ -38,15 +37,15 @@ void setup_scr_screen_set_clock(lv_ui *ui)
     //Write style for screen_set_clock_roller_hour, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->screen_set_clock_roller_hour, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_set_clock_roller_hour, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_hour, lv_color_hex(APP_THEME_CARD), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_hour, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_clock_roller_hour, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_set_clock_roller_hour, lv_color_hex(APP_THEME_CARD), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_set_clock_roller_hour, lv_color_hex(0x333333), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_set_clock_roller_hour, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_set_clock_roller_hour, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_set_clock_roller_hour, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_set_clock_roller_hour, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui->screen_set_clock_roller_hour, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui->screen_set_clock_roller_hour, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui->screen_set_clock_roller_hour, lv_color_hex(0xe6e6e6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui->screen_set_clock_roller_hour, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->screen_set_clock_roller_hour, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->screen_set_clock_roller_hour, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -54,9 +53,9 @@ void setup_scr_screen_set_clock(lv_ui *ui)
 
     //Write style for screen_set_clock_roller_hour, Part: LV_PART_SELECTED, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_set_clock_roller_hour, 255, LV_PART_SELECTED|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_hour, lv_color_hex(APP_THEME_ACCENT), LV_PART_SELECTED|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_hour, lv_color_hex(0x2195f6), LV_PART_SELECTED|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_clock_roller_hour, LV_GRAD_DIR_NONE, LV_PART_SELECTED|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_set_clock_roller_hour, lv_color_hex(APP_THEME_ON_ACCENT), LV_PART_SELECTED|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_set_clock_roller_hour, lv_color_hex(0xFFFFFF), LV_PART_SELECTED|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_set_clock_roller_hour, &lv_font_ZiTiQuanWeiJunHeiW22_24, LV_PART_SELECTED|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_set_clock_roller_hour, 255, LV_PART_SELECTED|LV_STATE_DEFAULT);
 
@@ -70,15 +69,15 @@ void setup_scr_screen_set_clock(lv_ui *ui)
     //Write style for screen_set_clock_roller_minute, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->screen_set_clock_roller_minute, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_set_clock_roller_minute, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_minute, lv_color_hex(APP_THEME_CARD), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_minute, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_clock_roller_minute, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_set_clock_roller_minute, lv_color_hex(APP_THEME_CARD), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_set_clock_roller_minute, lv_color_hex(0x333333), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_set_clock_roller_minute, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_set_clock_roller_minute, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_set_clock_roller_minute, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_set_clock_roller_minute, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui->screen_set_clock_roller_minute, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui->screen_set_clock_roller_minute, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui->screen_set_clock_roller_minute, lv_color_hex(0xe6e6e6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui->screen_set_clock_roller_minute, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->screen_set_clock_roller_minute, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->screen_set_clock_roller_minute, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -86,9 +85,9 @@ void setup_scr_screen_set_clock(lv_ui *ui)
 
     //Write style for screen_set_clock_roller_minute, Part: LV_PART_SELECTED, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_set_clock_roller_minute, 255, LV_PART_SELECTED|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_minute, lv_color_hex(APP_THEME_ACCENT), LV_PART_SELECTED|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_clock_roller_minute, lv_color_hex(0x2195f6), LV_PART_SELECTED|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_clock_roller_minute, LV_GRAD_DIR_NONE, LV_PART_SELECTED|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_set_clock_roller_minute, lv_color_hex(APP_THEME_ON_ACCENT), LV_PART_SELECTED|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_set_clock_roller_minute, lv_color_hex(0xFFFFFF), LV_PART_SELECTED|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_set_clock_roller_minute, &lv_font_ZiTiQuanWeiJunHeiW22_24, LV_PART_SELECTED|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_set_clock_roller_minute, 255, LV_PART_SELECTED|LV_STATE_DEFAULT);
 
@@ -106,12 +105,12 @@ void setup_scr_screen_set_clock(lv_ui *ui)
 
     //Write style for screen_set_clock_btn_set, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_set_clock_btn_set, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_clock_btn_set, lv_color_hex(APP_THEME_ACCENT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_clock_btn_set, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_clock_btn_set, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_set_clock_btn_set, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_set_clock_btn_set, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_set_clock_btn_set, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_set_clock_btn_set, lv_color_hex(APP_THEME_ON_ACCENT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_set_clock_btn_set, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_set_clock_btn_set, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_set_clock_btn_set, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_set_clock_btn_set, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -129,12 +128,12 @@ void setup_scr_screen_set_clock(lv_ui *ui)
 
     //Write style for screen_set_clock_btn_return, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_set_clock_btn_return, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_clock_btn_return, lv_color_hex(APP_THEME_ACCENT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_clock_btn_return, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_clock_btn_return, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_set_clock_btn_return, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_set_clock_btn_return, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_set_clock_btn_return, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_set_clock_btn_return, lv_color_hex(APP_THEME_ON_ACCENT), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_set_clock_btn_return, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_set_clock_btn_return, &lv_font_ZiTiQuanWeiJunHeiW22_18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_set_clock_btn_return, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_set_clock_btn_return, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);

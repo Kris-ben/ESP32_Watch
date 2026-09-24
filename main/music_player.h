@@ -13,6 +13,7 @@ esp_err_t music_player_set_selected_file(const char *filename);
 const char *music_player_get_selected_file(void);
 
 esp_err_t music_player_play_selected(void);
+esp_err_t music_player_request_play_selected(void);
 esp_err_t music_player_toggle_pause(void);
 void music_player_stop(void);
 

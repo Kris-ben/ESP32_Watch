@@ -19,6 +19,8 @@
 #include "max98357a.h"
 #include "spark_chat.h"
 #include "voice_dialog.h"
+#include "ui/voice_chat_popup.h"
+#include "ui/voice_wake_overlay.h"
 #include "ai_chat/ai_chat_config.h"
 #include "ai_command.h"
 
@@ -102,22 +104,46 @@ static void on_dialog_event(voice_dialog_event_t event, const char *data, void *
     switch (event) {
     case VOICE_DIALOG_EVENT_WAKEUP:
         ESP_LOGI(TAG, "已唤醒，等待说话");
+        voice_wake_overlay_show();
+        voice_chat_popup_wake();
         ui_set_label(&s_ui->screen_AI_label_ai, "我在，请说…");
         ui_set_label(&s_ui->screen_AI_label_user, "");
         break;
+    case VOICE_DIALOG_EVENT_SESSION_END:
+        voice_wake_overlay_hide();
+        voice_chat_popup_session_end();
+        break;
     case VOICE_DIALOG_EVENT_RECORD_START:
+        voice_wake_overlay_set_mode(VOICE_WAKE_OVERLAY_LISTENING);
+        voice_chat_popup_listening();
         ui_set_label(&s_ui->screen_AI_label_user, "（正在听…）");
+        break;
+    case VOICE_DIALOG_EVENT_RECORD_END:
+        voice_wake_overlay_set_mode(VOICE_WAKE_OVERLAY_THINKING);
+        voice_chat_popup_thinking();
         break;
     case VOICE_DIALOG_EVENT_ASR_RESULT:
         remember_dialog_text(true, data);
+        voice_chat_popup_question(data);
         ui_set_label(&s_ui->screen_AI_label_user, data ? data : "");
         ui_set_label(&s_ui->screen_AI_label_ai, "正在整理回答…");
         break;
     case VOICE_DIALOG_EVENT_AI_RESPONSE:
+        voice_wake_overlay_set_mode(VOICE_WAKE_OVERLAY_REPLYING);
         remember_dialog_text(false, data);
+        voice_chat_popup_answer(data);
         ui_set_label(&s_ui->screen_AI_label_ai, data ? data : "");
         break;
+    case VOICE_DIALOG_EVENT_TTS_START:
+        voice_wake_overlay_set_mode(VOICE_WAKE_OVERLAY_REPLYING);
+        voice_chat_popup_replying();
+        break;
+    case VOICE_DIALOG_EVENT_TTS_END:
+        voice_wake_overlay_set_mode(VOICE_WAKE_OVERLAY_LISTENING);
+        voice_chat_popup_listening();
+        break;
     case VOICE_DIALOG_EVENT_ERROR:
+        voice_chat_popup_answer("出错了，请再试");
         ui_set_label(&s_ui->screen_AI_label_ai, "（出错了）");
         break;
     default:

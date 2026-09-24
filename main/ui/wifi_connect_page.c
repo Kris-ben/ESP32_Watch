@@ -1,4 +1,3 @@
-#include "app_theme.h"
 #include "wifi_connect_page.h"
 
 #include "guider_customer_fonts.h"
@@ -135,21 +134,21 @@ void wifi_connect_page_init(lv_ui *ui)
     if (!ui || !ui->screen_wifi_connect) return;
 
     lv_obj_t *screen = ui->screen_wifi_connect;
-    lv_obj_set_style_bg_color(screen, lv_color_hex(APP_THEME_BG), 0);
+    lv_obj_set_style_bg_color(screen, lv_color_hex(0x090d15), 0);
     lv_obj_remove_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_label_set_text(ui->screen_wifi_connect_label_connect, "连接 WiFi");
     style_label(ui->screen_wifi_connect_label_connect, 14, 13, 212, 28,
-                APP_THEME_TEXT, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18);
+                0xffffff, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18);
 
     lv_label_set_text(ui->screen_wifi_connect_label_wifi, "所选网络");
     style_label(ui->screen_wifi_connect_label_wifi, 14, 49, 200, 20,
-                APP_THEME_MUTED, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12);
+                0xaac0d7, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12);
 
     lv_obj_t *ssid = ui->screen_wifi_connect_label_wifiname;
-    style_label(ssid, 12, 70, 216, 35, APP_THEME_TEXT,
+    style_label(ssid, 12, 70, 216, 35, 0xffffff,
                 &lv_customer_font_ZiTiQuanWeiJunHeiW22_18);
-    lv_obj_set_style_bg_color(ssid, lv_color_hex(APP_THEME_CARD), 0);
+    lv_obj_set_style_bg_color(ssid, lv_color_hex(0x182a36), 0);
     lv_obj_set_style_bg_opa(ssid, LV_OPA_COVER, 0);
     lv_obj_set_style_radius(ssid, 9, 0);
     lv_obj_set_style_pad_all(ssid, 7, 0);
@@ -157,16 +156,16 @@ void wifi_connect_page_init(lv_ui *ui)
 
     lv_obj_t *password_label = lv_label_create(screen);
     lv_label_set_text(password_label, "密码");
-    style_label(password_label, 14, 110, 180, 20, APP_THEME_MUTED,
+    style_label(password_label, 14, 110, 180, 20, 0xaac0d7,
                 &lv_customer_font_ZiTiQuanWeiJunHeiW22_12);
 
     lv_obj_t *input = ui->screen_wifi_connect_ta_input;
     lv_obj_set_pos(input, 12, 132);
     lv_obj_set_size(input, 170, 40);
     lv_obj_set_style_text_font(input, &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-    lv_obj_set_style_text_color(input, lv_color_hex(APP_THEME_TEXT), 0);
-    lv_obj_set_style_bg_color(input, lv_color_hex(APP_THEME_CARD), 0);
-    lv_obj_set_style_border_color(input, lv_color_hex(APP_THEME_BORDER), 0);
+    lv_obj_set_style_text_color(input, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_bg_color(input, lv_color_hex(0x18212d), 0);
+    lv_obj_set_style_border_color(input, lv_color_hex(0x415773), 0);
     lv_obj_set_style_border_width(input, 1, 0);
     lv_obj_set_style_radius(input, 9, 0);
     lv_textarea_set_placeholder_text(input, "输入密码");
@@ -178,18 +177,18 @@ void wifi_connect_page_init(lv_ui *ui)
     lv_obj_t *eye = lv_button_create(screen);
     lv_obj_set_pos(eye, 188, 132);
     lv_obj_set_size(eye, 40, 40);
-    lv_obj_set_style_bg_color(eye, lv_color_hex(APP_THEME_CARD), 0);
+    lv_obj_set_style_bg_color(eye, lv_color_hex(0x26364d), 0);
     lv_obj_set_style_radius(eye, 9, 0);
     lv_obj_set_style_shadow_width(eye, 0, 0);
     lv_obj_t *eye_label = lv_label_create(eye);
     lv_label_set_text(eye_label, "显示");
     lv_obj_set_style_text_font(eye_label, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, 0);
-    lv_obj_set_style_text_color(eye_label, lv_color_hex(APP_THEME_TEXT), 0);
+    lv_obj_set_style_text_color(eye_label, lv_color_hex(0xffffff), 0);
     lv_obj_center(eye_label);
 
     lv_obj_t *status = lv_label_create(screen);
     lv_label_set_text(status, "键盘确认后点击连接");
-    style_label(status, 14, 184, 212, 32, APP_THEME_MUTED,
+    style_label(status, 14, 184, 212, 32, 0xb9cde2,
                 &lv_customer_font_ZiTiQuanWeiJunHeiW22_12);
     lv_label_set_long_mode(status, LV_LABEL_LONG_WRAP);
 
@@ -197,9 +196,7 @@ void wifi_connect_page_init(lv_ui *ui)
     lv_obj_set_pos(button, 12, 226);
     lv_obj_set_size(button, 216, 45);
     lv_obj_set_style_radius(button, 10, 0);
-    lv_obj_set_style_bg_color(button, lv_color_hex(APP_THEME_ACCENT), 0);
-    lv_obj_set_style_text_color(ui->screen_wifi_connect_btn_set_label,
-                                lv_color_hex(APP_THEME_ON_ACCENT), 0);
+    lv_obj_set_style_bg_color(button, lv_color_hex(0x247fda), 0);
     lv_label_set_text(ui->screen_wifi_connect_btn_set_label, "连接");
     lv_obj_set_style_text_font(ui->screen_wifi_connect_btn_set_label,
                                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);

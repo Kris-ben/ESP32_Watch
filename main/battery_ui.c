@@ -2,11 +2,10 @@
  * @file battery_ui.c
  * @brief 电池电量UI显示模块实现
  *
- * - 定期从 battery_monitor 读取电量，更新两个屏幕上的电池控件
+ * - 定期从 battery_monitor 读取电压，更新各页面的估算电量
  * - 使用 lv_obj_clean + lv_list_add_button 安全重建控件
  */
 
-#include "app_theme.h"
 #include "battery_ui.h"
 #include "battery_monitor.h"
 #include "freertos/FreeRTOS.h"
@@ -23,7 +22,14 @@ static const char *TAG = "BATTERY_UI";
 static lv_ui *s_ui = NULL;
 extern SemaphoreHandle_t lvgl_mutex;
 
-LV_FONT_DECLARE(lv_font_ZiTiQuanWeiJunHeiW22_12)
+const char *battery_ui_symbol_for_percentage(int percentage)
+{
+    if (percentage >= 80) return LV_SYMBOL_BATTERY_FULL;
+    if (percentage >= 60) return LV_SYMBOL_BATTERY_3;
+    if (percentage >= 40) return LV_SYMBOL_BATTERY_2;
+    if (percentage >= 20) return LV_SYMBOL_BATTERY_1;
+    return LV_SYMBOL_BATTERY_EMPTY;
+}
 
 /**
  * @brief 清空列表，重建按钮并应用样式
@@ -31,12 +37,16 @@ LV_FONT_DECLARE(lv_font_ZiTiQuanWeiJunHeiW22_12)
  * @param list       列表对象 (screen_xxx_list_bettery)
  * @param item_ptr   按钮指针存储位置
  * @param icon       电池符号
- * @param text       百分比文本
+ * @param text       估算百分比文本
  */
 static void battery_update_list(lv_obj_t *list, lv_obj_t **item_ptr,
                                 const char *icon, const char *text)
 {
     if (!list || !lv_obj_is_valid(list)) return;
+
+    lv_obj_set_style_pad_all(list, 0, 0);
+    lv_obj_remove_flag(list, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(list, LV_OBJ_FLAG_GESTURE_BUBBLE);
 
     /* 清除旧按钮 */
     lv_obj_clean(list);
@@ -45,18 +55,15 @@ static void battery_update_list(lv_obj_t *list, lv_obj_t **item_ptr,
     lv_obj_t *btn = lv_list_add_button(list, icon, text);
     if (!btn) return;
 
-    /* 基础样式 */
-    lv_obj_set_style_pad_top(btn, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(btn, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(btn, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(btn, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(btn, lv_color_hex(APP_THEME_TEXT), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(btn, &lv_font_ZiTiQuanWeiJunHeiW22_12, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(btn, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(btn, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(btn, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(btn, lv_color_hex(APP_THEME_BG), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_size(btn, LV_PCT(100), 24);
+    lv_obj_set_style_pad_all(btn, 0, 0);
+    lv_obj_set_style_pad_column(btn, 2, 0);
+    lv_obj_set_style_border_width(btn, 0, 0);
+    lv_obj_set_style_text_color(btn, lv_color_hex(0xfbfbfb), 0);
+    lv_obj_set_style_text_font(btn, &lv_font_montserrat_14, 0);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_TRANSP, 0);
+    lv_obj_remove_flag(btn, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(btn, LV_OBJ_FLAG_GESTURE_BUBBLE);
 
     *item_ptr = btn;
 }
@@ -69,29 +76,27 @@ static void battery_ui_apply_info_nolock(lv_ui *ui, const battery_info_t *info)
         return;
     }
 
-    char voltage_text[16];
-    if (info->voltage_mv < 0) {
-        snprintf(voltage_text, sizeof(voltage_text), "--");
-    } else {
-        // USB 充电时 BAT+ 电压不能证明电池容量，界面只显示直接测得的电压。
-        snprintf(voltage_text, sizeof(voltage_text), "%d.%02dV",
-                 info->voltage_mv / 1000, (info->voltage_mv % 1000) / 10);
-    }
+    char percentage_text[8];
+    int percentage = info->percentage;
+    if (percentage > 100) percentage = 100;
+    if (percentage < 0) snprintf(percentage_text, sizeof(percentage_text), "--");
+    else snprintf(percentage_text, sizeof(percentage_text), "%d%%", percentage);
+    const char *icon = battery_ui_symbol_for_percentage(percentage);
 
     battery_update_list(ui->screen_home_list_bettery,
                         &ui->screen_home_list_bettery_item0,
-                        NULL, voltage_text);
+                        icon, percentage_text);
 
     battery_update_list(ui->screen_weather_list_bettery,
                         &ui->screen_weather_list_bettery_item0,
-                        NULL, voltage_text);
+                        icon, percentage_text);
 
     battery_update_list(ui->screen_wifi_list_battery,
                         &ui->screen_wifi_list_battery_item0,
-                        NULL, voltage_text);
+                        icon, percentage_text);
     battery_update_list(ui->screen_AI_list_battery,
                         &ui->screen_AI_list_battery_item0,
-                        NULL, voltage_text);
+                        icon, percentage_text);
     if (ui->screen_AI_list_battery && ui->screen_AI_list_battery_item0 &&
         lv_obj_is_valid(ui->screen_AI_list_battery) &&
         lv_obj_is_valid(ui->screen_AI_list_battery_item0) &&
@@ -102,16 +107,17 @@ static void battery_ui_apply_info_nolock(lv_ui *ui, const battery_info_t *info)
     }
     battery_update_list(ui->screen_musiclist_list_battery,
                         &ui->screen_musiclist_list_battery_item0,
-                        NULL, voltage_text);
+                        icon, percentage_text);
     battery_update_list(ui->screen_play_list_battery,
                         &ui->screen_play_list_battery_item0,
-                        NULL, voltage_text);
+                        icon, percentage_text);
     battery_update_list(ui->screen_play_list_3,
                         &ui->screen_play_list_3_item0,
-                        NULL, voltage_text);
+                        icon, percentage_text);
 
     if (info->voltage_mv >= 0) {
-        ESP_LOGI(TAG, "BAT+ 测量电压: %dmV (充电时不代表剩余电量)", info->voltage_mv);
+        ESP_LOGI(TAG, "BAT+ 测量电压: %dmV, 估算电量: %d%% (充电时仅供参考)",
+                 info->voltage_mv, info->percentage);
     }
 }
 
@@ -176,6 +182,8 @@ bool battery_ui_init(lv_ui *ui)
     ESP_LOGI(TAG, "未安装电池，界面保持 --，无需启动采样任务");
     return true;
 #endif
+
+    battery_ui_update(ui);
 
     BaseType_t ret = xTaskCreate(battery_ui_task, "battery_ui",
                                  3072, NULL, 3, NULL);

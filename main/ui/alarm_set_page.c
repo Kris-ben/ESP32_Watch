@@ -1,4 +1,3 @@
-#include "app_theme.h"
 #include "alarm_set_page.h"
 
 #include <stdint.h>
@@ -70,11 +69,11 @@ static void make_adjust_button(lv_obj_t *parent, int x, int y, const char *text,
     lv_obj_set_pos(button, x, y);
     lv_obj_set_size(button, 100, 46);
     lv_obj_set_style_radius(button, 12, 0);
-    lv_obj_set_style_bg_color(button, lv_color_hex(APP_THEME_RAISED), 0);
+    lv_obj_set_style_bg_color(button, lv_color_hex(0x334c6a), 0);
     lv_obj_set_style_shadow_width(button, 0, 0);
     lv_obj_set_user_data(button, (void *)(intptr_t)action);
     lv_obj_add_event_cb(button, change_time_cb, LV_EVENT_CLICKED, page);
-    make_label(button, text, 0, 8, 100, 30, APP_THEME_TEXT,
+    make_label(button, text, 0, 8, 100, 30, 0xffffff,
                &lv_font_ZiTiQuanWeiJunHeiW22_24);
 }
 
@@ -101,20 +100,20 @@ void alarm_set_page_init(lv_ui *ui)
     lv_obj_t *screen = ui->screen_set_clock;
     char title[32];
     snprintf(title, sizeof(title), "设置闹钟 %d", page->index + 1);
-    make_label(screen, title, 10, 12, 220, 31, APP_THEME_TEXT,
+    make_label(screen, title, 10, 12, 220, 31, 0xffffff,
                &lv_font_ZiTiQuanWeiJunHeiW22_24);
-    make_label(screen, "小时", 12, 49, 100, 25, APP_THEME_TEXT,
+    make_label(screen, "小时", 12, 49, 100, 25, 0xffffff,
                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18);
-    make_label(screen, "分钟", 128, 49, 100, 25, APP_THEME_TEXT,
+    make_label(screen, "分钟", 128, 49, 100, 25, 0xffffff,
                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18);
 
     make_adjust_button(screen, 12, 76, "+", 1, page);
     make_adjust_button(screen, 128, 76, "+", 2, page);
-    page->hour_value = make_label(screen, "00", 12, 132, 100, 39, APP_THEME_TEXT,
+    page->hour_value = make_label(screen, "00", 12, 132, 100, 39, 0xffffff,
                                   &lv_font_ZiTiQuanWeiJunHeiW22_24);
-    make_label(screen, ":", 112, 130, 16, 39, APP_THEME_ACCENT,
+    make_label(screen, ":", 112, 130, 16, 39, 0x56a9ff,
                &lv_font_ZiTiQuanWeiJunHeiW22_24);
-    page->minute_value = make_label(screen, "00", 128, 132, 100, 39, APP_THEME_TEXT,
+    page->minute_value = make_label(screen, "00", 128, 132, 100, 39, 0xffffff,
                                     &lv_font_ZiTiQuanWeiJunHeiW22_24);
     make_adjust_button(screen, 12, 178, "-", -1, page);
     make_adjust_button(screen, 128, 178, "-", -2, page);

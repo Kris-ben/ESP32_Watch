@@ -1,4 +1,3 @@
-#include "app_theme.h"
 #include "quick_settings_page.h"
 
 #include <stdio.h>
@@ -10,10 +9,10 @@
 #include "system_settings.h"
 #include "wifi_connect.h"
 
-#define COLOR_BG       APP_THEME_BG
-#define COLOR_CARD     APP_THEME_CARD
-#define COLOR_TEXT     APP_THEME_TEXT
-#define COLOR_SUBTEXT  APP_THEME_MUTED
+#define COLOR_BG       0x080f1b
+#define COLOR_CARD     0x162436
+#define COLOR_TEXT     0xf0f6ff
+#define COLOR_SUBTEXT  0xaac0d7
 
 
 
@@ -94,7 +93,7 @@ static void refresh_status(lv_timer_t *timer)
     wifi_ap_record_t ap = {0};
     if (wifi_connect_is_connected() && esp_wifi_sta_get_ap_info(&ap) == ESP_OK) {
         lv_label_set_text_fmt(s_wifi_status, "已连接  %s", ap.ssid);
-        lv_obj_set_style_text_color(s_wifi_status, lv_color_hex(APP_THEME_ACCENT), 0);
+        lv_obj_set_style_text_color(s_wifi_status, lv_color_hex(0x8edcc7), 0);
     } else {
         lv_label_set_text(s_wifi_status, "未连接  点击设置");
         lv_obj_set_style_text_color(s_wifi_status, lv_color_hex(COLOR_SUBTEXT), 0);
@@ -217,14 +216,14 @@ static lv_obj_t *add_slider(lv_obj_t *parent, int y, int value,
     lv_obj_set_pos(slider, 54, y - 2);
     lv_obj_set_size(slider, 148, 22);
     lv_obj_set_ext_click_area(slider, 14);
-    lv_obj_set_style_bg_color(slider, lv_color_hex(APP_THEME_RAISED), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(slider, lv_color_hex(0x344459), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(slider, LV_OPA_COVER, LV_PART_MAIN);
     lv_obj_set_style_border_width(slider, 0, LV_PART_MAIN);
     lv_obj_set_style_radius(slider, 9, LV_PART_MAIN);
     lv_obj_set_style_bg_color(slider, lv_color_hex(color), LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(slider, LV_OPA_COVER, LV_PART_INDICATOR);
     lv_obj_set_style_radius(slider, 9, LV_PART_INDICATOR);
-    lv_obj_set_style_bg_color(slider, lv_color_hex(APP_THEME_TEXT), LV_PART_KNOB);
+    lv_obj_set_style_bg_color(slider, lv_color_hex(0xf5f8ff), LV_PART_KNOB);
     lv_obj_set_style_bg_opa(slider, LV_OPA_COVER, LV_PART_KNOB);
     lv_obj_set_style_pad_all(slider, 5, LV_PART_KNOB);
     lv_slider_set_range(slider, 0, 100);
@@ -262,7 +261,7 @@ void quick_settings_page_open(lv_ui *ui)
     lv_obj_add_flag(s_panel, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_t *handle = lv_obj_create(s_panel);
-    set_rect(handle, 99, 6, 42, 4, APP_THEME_RAISED, 2);
+    set_rect(handle, 99, 6, 42, 4, 0x52667c, 2);
     lv_obj_remove_flag(handle, LV_OBJ_FLAG_CLICKABLE);
 
     add_label(s_panel, 14, 19, 145, 27, "快捷设置", true, COLOR_TEXT);
@@ -270,16 +269,19 @@ void quick_settings_page_open(lv_ui *ui)
     lv_obj_set_style_text_align(s_time, LV_TEXT_ALIGN_RIGHT, 0);
 
     lv_obj_t *wifi = lv_obj_create(s_panel);
-    set_rect(wifi, 10, 55, 220, 64, APP_THEME_CARD, 14);
+    set_rect(wifi, 10, 55, 220, 64, 0x192a3e, 14);
     lv_obj_set_style_pad_all(wifi, 0, 0);
     lv_obj_add_flag(wifi, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_style_bg_color(wifi, lv_color_hex(0x294463), LV_STATE_PRESSED);
+    lv_obj_set_style_border_color(wifi, lv_color_hex(0x5aafff), LV_STATE_PRESSED);
+    lv_obj_set_style_border_width(wifi, 1, LV_STATE_PRESSED);
     lv_obj_t *wifi_icon = lv_obj_create(wifi);
-    set_rect(wifi_icon, 8, 11, 42, 42, APP_THEME_RAISED, 11);
+    set_rect(wifi_icon, 8, 11, 42, 42, 0x1d71d5, 11);
     lv_obj_set_style_pad_all(wifi_icon, 0, 0);
     lv_obj_remove_flag(wifi_icon, LV_OBJ_FLAG_CLICKABLE);
     add_icon(wifi_icon, 3, 3, &quick_icon_wifi);
     add_label(wifi, 60, 10, 136, 25, "WiFi 网络", true, COLOR_TEXT);
-    s_wifi_status = add_label(wifi, 60, 37, 147, 20, "正在检查", false, APP_THEME_ACCENT);
+    s_wifi_status = add_label(wifi, 60, 37, 147, 20, "正在检查", false, 0x8edcc7);
     add_icon(wifi, 199, 24, &quick_icon_chevron);
     lv_obj_add_event_cb(wifi, wifi_clicked_cb, LV_EVENT_CLICKED, NULL);
 
@@ -292,7 +294,7 @@ void quick_settings_page_open(lv_ui *ui)
     lv_obj_set_style_text_align(s_brightness_value, LV_TEXT_ALIGN_RIGHT, 0);
     add_icon(brightness, 13, 33, &quick_icon_sun);
     lv_obj_t *brightness_slider = add_slider(
-        brightness, 36, system_get_brightness(), APP_THEME_ACCENT,
+        brightness, 36, system_get_brightness(), 0xffc259,
         s_brightness_value, &s_brightness_touch, true);
     lv_slider_set_range(brightness_slider, 5, 100);
     lv_label_set_text_fmt(s_brightness_value, "%u%%", system_get_brightness());
@@ -306,7 +308,7 @@ void quick_settings_page_open(lv_ui *ui)
     s_volume_value = add_label(volume, 177, 9, 32, 20, "", false, COLOR_SUBTEXT);
     lv_obj_set_style_text_align(s_volume_value, LV_TEXT_ALIGN_RIGHT, 0);
     add_icon(volume, 13, 33, &quick_icon_speaker);
-    add_slider(volume, 36, system_get_volume(), APP_THEME_ACCENT,
+    add_slider(volume, 36, system_get_volume(), 0x5aafff,
                s_volume_value, &s_volume_touch, false);
     lv_obj_add_event_cb(volume, volume_card_event_cb, LV_EVENT_PRESSED,
                         &s_volume_touch);
@@ -319,7 +321,7 @@ void quick_settings_page_open(lv_ui *ui)
     lv_label_set_text_fmt(s_volume_value, "%u%%", system_get_volume());
 
     lv_obj_t *hint = add_label(s_panel, 80, 266, 80, 15,
-                               "上滑收起", false, APP_THEME_MUTED);
+                               "上滑收起", false, 0x7790aa);
     lv_obj_set_style_text_align(hint, LV_TEXT_ALIGN_CENTER, 0);
 
     refresh_status(NULL);

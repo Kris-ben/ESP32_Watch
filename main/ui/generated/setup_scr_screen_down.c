@@ -7,7 +7,6 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
-#include "app_theme.h"
 #include "lvgl.h"
 #include <stdio.h>
 #include "gui_guider.h"
@@ -26,7 +25,7 @@ void setup_scr_screen_down(lv_ui *ui)
 
     //Write style for screen_down, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_down, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_down, lv_color_hex(APP_THEME_BG), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_down, lv_color_hex(0x010101), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_down, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_down_list_voice
@@ -45,11 +44,11 @@ void setup_scr_screen_down(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_down_list_voice_main_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_down_list_voice_main_main_default, 5);
     lv_style_set_bg_opa(&style_screen_down_list_voice_main_main_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_voice_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_voice_main_main_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_down_list_voice_main_main_default, LV_GRAD_DIR_NONE);
     lv_style_set_border_width(&style_screen_down_list_voice_main_main_default, 1);
     lv_style_set_border_opa(&style_screen_down_list_voice_main_main_default, 255);
-    lv_style_set_border_color(&style_screen_down_list_voice_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_border_color(&style_screen_down_list_voice_main_main_default, lv_color_hex(0x050505));
     lv_style_set_border_side(&style_screen_down_list_voice_main_main_default, LV_BORDER_SIDE_FULL);
     lv_style_set_radius(&style_screen_down_list_voice_main_main_default, 3);
     lv_style_set_shadow_width(&style_screen_down_list_voice_main_main_default, 0);
@@ -61,7 +60,7 @@ void setup_scr_screen_down(lv_ui *ui)
 
     lv_style_set_radius(&style_screen_down_list_voice_main_scrollbar_default, 3);
     lv_style_set_bg_opa(&style_screen_down_list_voice_main_scrollbar_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_voice_main_scrollbar_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_voice_main_scrollbar_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_down_list_voice_main_scrollbar_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_down_list_voice, &style_screen_down_list_voice_main_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
@@ -74,12 +73,12 @@ void setup_scr_screen_down(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_down_list_voice_extra_btns_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_down_list_voice_extra_btns_main_default, 5);
     lv_style_set_border_width(&style_screen_down_list_voice_extra_btns_main_default, 0);
-    lv_style_set_text_color(&style_screen_down_list_voice_extra_btns_main_default, lv_color_hex(APP_THEME_TEXT));
+    lv_style_set_text_color(&style_screen_down_list_voice_extra_btns_main_default, lv_color_hex(0xe8e8e8));
     lv_style_set_text_font(&style_screen_down_list_voice_extra_btns_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_16);
     lv_style_set_text_opa(&style_screen_down_list_voice_extra_btns_main_default, 255);
     lv_style_set_radius(&style_screen_down_list_voice_extra_btns_main_default, 3);
     lv_style_set_bg_opa(&style_screen_down_list_voice_extra_btns_main_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_voice_extra_btns_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_voice_extra_btns_main_default, lv_color_hex(0x070707));
     lv_style_set_bg_grad_dir(&style_screen_down_list_voice_extra_btns_main_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_down_list_voice_item0, &style_screen_down_list_voice_extra_btns_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
 
@@ -92,13 +91,13 @@ void setup_scr_screen_down(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_down_list_voice_extra_texts_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_down_list_voice_extra_texts_main_default, 5);
     lv_style_set_border_width(&style_screen_down_list_voice_extra_texts_main_default, 0);
-    lv_style_set_text_color(&style_screen_down_list_voice_extra_texts_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_text_color(&style_screen_down_list_voice_extra_texts_main_default, lv_color_hex(0x0b0b0b));
     lv_style_set_text_font(&style_screen_down_list_voice_extra_texts_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_12);
     lv_style_set_text_opa(&style_screen_down_list_voice_extra_texts_main_default, 255);
     lv_style_set_radius(&style_screen_down_list_voice_extra_texts_main_default, 3);
     lv_style_set_transform_width(&style_screen_down_list_voice_extra_texts_main_default, 0);
     lv_style_set_bg_opa(&style_screen_down_list_voice_extra_texts_main_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_voice_extra_texts_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_voice_extra_texts_main_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_down_list_voice_extra_texts_main_default, LV_GRAD_DIR_NONE);
 
     //Write codes screen_down_list_brightness
@@ -117,11 +116,11 @@ void setup_scr_screen_down(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_down_list_brightness_main_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_down_list_brightness_main_main_default, 5);
     lv_style_set_bg_opa(&style_screen_down_list_brightness_main_main_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_brightness_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_brightness_main_main_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_down_list_brightness_main_main_default, LV_GRAD_DIR_NONE);
     lv_style_set_border_width(&style_screen_down_list_brightness_main_main_default, 1);
     lv_style_set_border_opa(&style_screen_down_list_brightness_main_main_default, 255);
-    lv_style_set_border_color(&style_screen_down_list_brightness_main_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_border_color(&style_screen_down_list_brightness_main_main_default, lv_color_hex(0x050505));
     lv_style_set_border_side(&style_screen_down_list_brightness_main_main_default, LV_BORDER_SIDE_FULL);
     lv_style_set_radius(&style_screen_down_list_brightness_main_main_default, 3);
     lv_style_set_shadow_width(&style_screen_down_list_brightness_main_main_default, 0);
@@ -133,7 +132,7 @@ void setup_scr_screen_down(lv_ui *ui)
 
     lv_style_set_radius(&style_screen_down_list_brightness_main_scrollbar_default, 3);
     lv_style_set_bg_opa(&style_screen_down_list_brightness_main_scrollbar_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_brightness_main_scrollbar_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_brightness_main_scrollbar_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_down_list_brightness_main_scrollbar_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_down_list_brightness, &style_screen_down_list_brightness_main_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
@@ -146,12 +145,12 @@ void setup_scr_screen_down(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_down_list_brightness_extra_btns_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_down_list_brightness_extra_btns_main_default, 5);
     lv_style_set_border_width(&style_screen_down_list_brightness_extra_btns_main_default, 0);
-    lv_style_set_text_color(&style_screen_down_list_brightness_extra_btns_main_default, lv_color_hex(APP_THEME_TEXT));
+    lv_style_set_text_color(&style_screen_down_list_brightness_extra_btns_main_default, lv_color_hex(0xe8e8e8));
     lv_style_set_text_font(&style_screen_down_list_brightness_extra_btns_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_16);
     lv_style_set_text_opa(&style_screen_down_list_brightness_extra_btns_main_default, 255);
     lv_style_set_radius(&style_screen_down_list_brightness_extra_btns_main_default, 3);
     lv_style_set_bg_opa(&style_screen_down_list_brightness_extra_btns_main_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_brightness_extra_btns_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_brightness_extra_btns_main_default, lv_color_hex(0x070707));
     lv_style_set_bg_grad_dir(&style_screen_down_list_brightness_extra_btns_main_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(ui->screen_down_list_brightness_item0, &style_screen_down_list_brightness_extra_btns_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
 
@@ -164,13 +163,13 @@ void setup_scr_screen_down(lv_ui *ui)
     lv_style_set_pad_right(&style_screen_down_list_brightness_extra_texts_main_default, 5);
     lv_style_set_pad_bottom(&style_screen_down_list_brightness_extra_texts_main_default, 5);
     lv_style_set_border_width(&style_screen_down_list_brightness_extra_texts_main_default, 0);
-    lv_style_set_text_color(&style_screen_down_list_brightness_extra_texts_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_text_color(&style_screen_down_list_brightness_extra_texts_main_default, lv_color_hex(0x0b0b0b));
     lv_style_set_text_font(&style_screen_down_list_brightness_extra_texts_main_default, &lv_font_ZiTiQuanWeiJunHeiW22_12);
     lv_style_set_text_opa(&style_screen_down_list_brightness_extra_texts_main_default, 255);
     lv_style_set_radius(&style_screen_down_list_brightness_extra_texts_main_default, 3);
     lv_style_set_transform_width(&style_screen_down_list_brightness_extra_texts_main_default, 0);
     lv_style_set_bg_opa(&style_screen_down_list_brightness_extra_texts_main_default, 255);
-    lv_style_set_bg_color(&style_screen_down_list_brightness_extra_texts_main_default, lv_color_hex(APP_THEME_BG));
+    lv_style_set_bg_color(&style_screen_down_list_brightness_extra_texts_main_default, lv_color_hex(0x000000));
     lv_style_set_bg_grad_dir(&style_screen_down_list_brightness_extra_texts_main_default, LV_GRAD_DIR_NONE);
 
     //Write codes screen_down_img_wifi
@@ -196,7 +195,7 @@ void setup_scr_screen_down(lv_ui *ui)
 
     //Write style for screen_down_slider_brightness, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_down_slider_brightness, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_down_slider_brightness, lv_color_hex(APP_THEME_MUTED), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_down_slider_brightness, lv_color_hex(0xe3dada), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_down_slider_brightness, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_down_slider_brightness, 8, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_outline_width(ui->screen_down_slider_brightness, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -204,13 +203,13 @@ void setup_scr_screen_down(lv_ui *ui)
 
     //Write style for screen_down_slider_brightness, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_down_slider_brightness, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_down_slider_brightness, lv_color_hex(APP_THEME_CARD), LV_PART_INDICATOR|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_down_slider_brightness, lv_color_hex(0xf2f2f2), LV_PART_INDICATOR|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_down_slider_brightness, LV_GRAD_DIR_NONE, LV_PART_INDICATOR|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_down_slider_brightness, 8, LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
     //Write style for screen_down_slider_brightness, Part: LV_PART_KNOB, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_down_slider_brightness, 255, LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_down_slider_brightness, lv_color_hex(APP_THEME_TEXT), LV_PART_KNOB|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_down_slider_brightness, lv_color_hex(0xefeeee), LV_PART_KNOB|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_down_slider_brightness, LV_GRAD_DIR_NONE, LV_PART_KNOB|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_down_slider_brightness, 8, LV_PART_KNOB|LV_STATE_DEFAULT);
 
@@ -224,7 +223,7 @@ void setup_scr_screen_down(lv_ui *ui)
 
     //Write style for screen_down_slider_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_down_slider_1, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_down_slider_1, lv_color_hex(APP_THEME_MUTED), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_down_slider_1, lv_color_hex(0xe3dada), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_down_slider_1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_down_slider_1, 8, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_outline_width(ui->screen_down_slider_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -232,13 +231,13 @@ void setup_scr_screen_down(lv_ui *ui)
 
     //Write style for screen_down_slider_1, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_down_slider_1, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_down_slider_1, lv_color_hex(APP_THEME_CARD), LV_PART_INDICATOR|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_down_slider_1, lv_color_hex(0xf2f2f2), LV_PART_INDICATOR|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_down_slider_1, LV_GRAD_DIR_NONE, LV_PART_INDICATOR|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_down_slider_1, 8, LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
     //Write style for screen_down_slider_1, Part: LV_PART_KNOB, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_down_slider_1, 255, LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_down_slider_1, lv_color_hex(APP_THEME_TEXT), LV_PART_KNOB|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_down_slider_1, lv_color_hex(0xefeeee), LV_PART_KNOB|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_down_slider_1, LV_GRAD_DIR_NONE, LV_PART_KNOB|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_down_slider_1, 8, LV_PART_KNOB|LV_STATE_DEFAULT);
 

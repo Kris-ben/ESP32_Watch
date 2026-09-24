@@ -1100,6 +1100,9 @@ static void voice_dialog_task(void *arg)
         ESP_LOGI(TAG, "对话轮次完成，继续监听");
         }  // 对话模式循环结束
         
+        if (h->callback) {
+            h->callback(VOICE_DIALOG_EVENT_SESSION_END, NULL, h->user_ctx);
+        }
         // 回到唤醒词监听，复用已开启的 I2S0。
     }  // 主循环结束
     

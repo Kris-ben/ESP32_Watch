@@ -284,25 +284,19 @@ static void process_sse_line(spark_chat_client_t *client, const char *line) {
         return;
     }
 
-    // Ark/OpenAI Responses 流式：data: {"type":"response.output_text.delta","delta":"..."}
+    // Responses 的 done 事件会重发完整文本；只拼接 delta，避免回复和 TTS 重复。
     cJSON *type = cJSON_GetObjectItem(root, "type");
     if (type != NULL && cJSON_IsString(type) && type->valuestring != NULL) {
         const char *t = type->valuestring;
-        if (strstr(t, "output_text") != NULL) {
+        if (strcmp(t, "response.output_text.delta") == 0) {
             cJSON *delta = cJSON_GetObjectItem(root, "delta");
             if (delta != NULL && cJSON_IsString(delta) && delta->valuestring != NULL) {
                 stream_content(client, delta->valuestring);
-                cJSON_Delete(root);
-                return;
-            }
-            cJSON *text = cJSON_GetObjectItem(root, "text");
-            if (text != NULL && cJSON_IsString(text) && text->valuestring != NULL) {
-                stream_content(client, text->valuestring);
-                cJSON_Delete(root);
-                return;
             }
         }
-        // 其他 type 事件（completed/created 等）忽略
+        // 其他事件（包括 response.output_text.done）只表示状态，不追加文本。
+        cJSON_Delete(root);
+        return;
     }
     
     // 检查是否是错误响应

@@ -1,4 +1,3 @@
-#include "app_theme.h"
 #include "ai_status_page.h"
 
 #include <stdint.h>
@@ -24,10 +23,10 @@ typedef struct {
 static lv_color_t state_color(voice_dialog_state_t state)
 {
     if (state == VOICE_DIALOG_THINKING || state == VOICE_DIALOG_RECOGNIZING)
-        return lv_color_hex(APP_THEME_ACCENT);
-    if (state == VOICE_DIALOG_SPEAKING) return lv_color_hex(APP_THEME_ACCENT);
-    if (state == VOICE_DIALOG_ERROR) return lv_color_hex(APP_THEME_ERROR);
-    return lv_color_hex(APP_THEME_ACCENT);
+        return lv_color_hex(0xe9bc75);
+    if (state == VOICE_DIALOG_SPEAKING) return lv_color_hex(0x80b8ff);
+    if (state == VOICE_DIALOG_ERROR) return lv_color_hex(0xf28585);
+    return lv_color_hex(0x61d9cd);
 }
 
 static const char *state_text(voice_dialog_state_t state)
@@ -114,7 +113,7 @@ static void motion_timer_cb(lv_timer_t *timer)
         motion->wifi_initialized = true;
         motion->wifi_connected = connected;
         lv_obj_set_style_text_color(motion->wifi_icon,
-                                    lv_color_hex(connected ? APP_THEME_ACCENT : APP_THEME_MUTED), 0);
+                                    lv_color_hex(connected ? 0x61d9cd : 0x778899), 0);
     }
     voice_dialog_state_t state = voice_assistant_get_state();
     bool changed = state != motion->state;
@@ -158,7 +157,7 @@ static void style_dialog_label(lv_obj_t *label, const char *text,
     lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
     lv_label_set_text(label, text);
     lv_obj_set_style_text_font(label, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, 0);
-    lv_obj_set_style_text_color(label, lv_color_hex(APP_THEME_TEXT), 0);
+    lv_obj_set_style_text_color(label, lv_color_hex(0xf2f6fc), 0);
     lv_obj_set_style_bg_color(label, background, 0);
     lv_obj_set_style_bg_opa(label, LV_OPA_COVER, 0);
     lv_obj_set_style_radius(label, 8, 0);
@@ -170,12 +169,12 @@ void ai_status_page_configure(lv_ui *ui)
 {
     if (!ui || !ui->screen_AI) return;
     lv_obj_t *screen = ui->screen_AI;
-    lv_obj_set_style_bg_color(screen, lv_color_hex(APP_THEME_BG), 0);
+    lv_obj_set_style_bg_color(screen, lv_color_hex(0x0b111b), 0);
     lv_obj_remove_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_set_pos(ui->screen_AI_cont_1, 0, 0);
     lv_obj_set_size(ui->screen_AI_cont_1, 240, 27);
-    lv_obj_set_style_bg_color(ui->screen_AI_cont_1, lv_color_hex(APP_THEME_BG), 0);
+    lv_obj_set_style_bg_color(ui->screen_AI_cont_1, lv_color_hex(0x0b111b), 0);
     lv_obj_set_style_border_width(ui->screen_AI_cont_1, 0, 0);
     lv_obj_remove_flag(ui->screen_AI_cont_1, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_pos(ui->screen_AI_digital_clock_1, 23, 4);
@@ -185,7 +184,7 @@ void ai_status_page_configure(lv_ui *ui)
     lv_obj_set_style_text_font(ui->screen_AI_digital_clock_1,
                                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
     lv_obj_set_style_text_align(ui->screen_AI_digital_clock_1, LV_TEXT_ALIGN_LEFT, 0);
-    lv_obj_set_style_text_color(ui->screen_AI_digital_clock_1, lv_color_hex(APP_THEME_MUTED), 0);
+    lv_obj_set_style_text_color(ui->screen_AI_digital_clock_1, lv_color_hex(0x9bacbf), 0);
     lv_obj_set_pos(ui->screen_AI_img_wifi, 138, 5);
     lv_obj_add_flag(ui->screen_AI_img_wifi, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_pos(ui->screen_AI_list_battery, 166, 3);
@@ -205,7 +204,7 @@ void ai_status_page_configure(lv_ui *ui)
     lv_obj_set_pos(ui->screen_AI_label_title, 15, 31);
     lv_obj_set_size(ui->screen_AI_label_title, 180, 27);
     lv_obj_set_style_bg_opa(ui->screen_AI_label_title, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_text_color(ui->screen_AI_label_title, lv_color_hex(APP_THEME_TEXT), 0);
+    lv_obj_set_style_text_color(ui->screen_AI_label_title, lv_color_hex(0xf2f6fc), 0);
     lv_obj_set_style_text_font(ui->screen_AI_label_title,
                                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
     lv_obj_set_style_text_align(ui->screen_AI_label_title, LV_TEXT_ALIGN_LEFT, 0);
@@ -218,7 +217,7 @@ void ai_status_page_configure(lv_ui *ui)
     lv_obj_set_pos(return_hint, 182, 38);
     lv_label_set_text(return_hint, "右滑返回");
     lv_obj_set_style_text_font(return_hint, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, 0);
-    lv_obj_set_style_text_color(return_hint, lv_color_hex(APP_THEME_MUTED), 0);
+    lv_obj_set_style_text_color(return_hint, lv_color_hex(0x9bacbf), 0);
 
     ai_motion_t *motion = calloc(1, sizeof(*motion));
     if (motion) {
@@ -228,7 +227,7 @@ void ai_status_page_configure(lv_ui *ui)
         lv_obj_set_pos(motion->ring, 88, 58);
         lv_obj_set_size(motion->ring, 64, 64);
         lv_obj_set_style_radius(motion->ring, LV_RADIUS_CIRCLE, 0);
-        lv_obj_set_style_bg_color(motion->ring, lv_color_hex(APP_THEME_SURFACE), 0);
+        lv_obj_set_style_bg_color(motion->ring, lv_color_hex(0x132b34), 0);
         lv_obj_set_style_border_width(motion->ring, 2, 0);
         lv_obj_set_style_pad_all(motion->ring, 0, 0);
         lv_obj_remove_flag(motion->ring, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
@@ -245,7 +244,7 @@ void ai_status_page_configure(lv_ui *ui)
         lv_obj_set_style_text_align(motion->status, LV_TEXT_ALIGN_CENTER, 0);
         lv_obj_set_style_text_font(motion->status,
                                    &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
-        lv_obj_set_style_text_color(motion->status, lv_color_hex(APP_THEME_TEXT), 0);
+        lv_obj_set_style_text_color(motion->status, lv_color_hex(0xf2f6fc), 0);
 
         motion->hint = lv_label_create(screen);
         lv_obj_set_pos(motion->hint, 12, 152);
@@ -253,7 +252,7 @@ void ai_status_page_configure(lv_ui *ui)
         lv_obj_set_style_text_align(motion->hint, LV_TEXT_ALIGN_CENTER, 0);
         lv_obj_set_style_text_font(motion->hint,
                                    &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, 0);
-        lv_obj_set_style_text_color(motion->hint, lv_color_hex(APP_THEME_MUTED), 0);
+        lv_obj_set_style_text_color(motion->hint, lv_color_hex(0x9bacbf), 0);
         motion->timer = lv_timer_create(motion_timer_cb, 220, motion);
         lv_obj_add_event_cb(screen, motion_deleted_cb, LV_EVENT_DELETE, motion);
         motion_timer_cb(motion->timer);
@@ -276,16 +275,16 @@ void ai_status_page_configure(lv_ui *ui)
     lv_obj_set_scrollbar_mode(transcript, LV_SCROLLBAR_MODE_AUTO);
     lv_obj_add_flag(transcript, LV_OBJ_FLAG_GESTURE_BUBBLE);
 
-    create_caption(transcript, "你说", lv_color_hex(APP_THEME_MUTED));
+    create_caption(transcript, "你说", lv_color_hex(0x9bacbf));
     lv_obj_set_parent(ui->screen_AI_label_user, transcript);
     style_dialog_label(ui->screen_AI_label_user,
                        question[0] ? question : "你说的话会显示在这里",
-                       lv_color_hex(APP_THEME_CARD));
-    create_caption(transcript, "小智", lv_color_hex(APP_THEME_ACCENT));
+                       lv_color_hex(0x1b2937));
+    create_caption(transcript, "小智", lv_color_hex(0x61d9cd));
     lv_obj_set_parent(ui->screen_AI_label_ai, transcript);
     style_dialog_label(ui->screen_AI_label_ai,
                        answer[0] ? answer : "喊小智开始对话",
-                       lv_color_hex(APP_THEME_SURFACE));
+                       lv_color_hex(0x162230));
 
     // 页面重建后旧指针清空，后台语音回调只写当前页面。
     lv_obj_null_on_delete(&ui->screen_AI);

@@ -12,6 +12,7 @@
 #include "sdmmc_cmd.h"
 #include "esp_log.h"
 #include <dirent.h>
+#include <errno.h>
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
@@ -49,7 +50,8 @@ esp_err_t sd_card_fs_mount(void)
 
     /* --- FATFS挂载 --- */
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = true,   // 无文件系统时自动格式化为FAT32
+        // 卡接触不良或文件系统暂时读错时绝不能清空用户的音乐文件。
+        .format_if_mount_failed = false,
         .max_files = 5,
         .allocation_unit_size = 16 * 1024,
     };
@@ -149,7 +151,10 @@ void sd_card_fs_list_all(const char *path, int depth)
 
     const char *dir_path = path ? path : SD_MOUNT_POINT;
     DIR *dir = opendir(dir_path);
-    if (!dir) return;
+    if (!dir) {
+        ESP_LOGE(TAG, "打开目录失败: %s, errno=%d (%s)", dir_path, errno, strerror(errno));
+        return;
+    }
 
     /* 生成缩进 */
     char indent[32] = "";
@@ -158,7 +163,9 @@ void sd_card_fs_list_all(const char *path, int depth)
     }
 
     struct dirent *entry;
+    int entry_count = 0;
     while ((entry = readdir(dir)) != NULL) {
+        entry_count++;
         char full_path[512];
         snprintf(full_path, sizeof(full_path), "%s/%s", dir_path, entry->d_name);
 
@@ -174,4 +181,7 @@ void sd_card_fs_list_all(const char *path, int depth)
     }
 
     closedir(dir);
+    if (depth == 0) {
+        ESP_LOGI(TAG, "SD根目录共有 %d 项", entry_count);
+    }
 }

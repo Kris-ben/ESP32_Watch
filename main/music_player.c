@@ -46,12 +46,15 @@ static music_player_state_t g_state = {
     .lock = NULL,
 };
 
+static TaskHandle_t s_control_task;
+
 typedef struct {
     max98357a_handle_t *speaker;
     uint32_t sample_rate;
     int16_t *mix_buffer;
     size_t mix_buffer_samples;
     uint32_t skip_ms;
+    uint8_t chunks_since_yield;
 } playback_ctx_t;
 
 static void ensure_lock(void)
@@ -79,6 +82,12 @@ static esp_err_t playback_pcm_cb(const int16_t *pcm_interleaved,
 {
     playback_ctx_t *ctx = (playback_ctx_t *)user_data;
     if (!ctx || !ctx->speaker || !pcm_interleaved || channels <= 0) return ESP_ERR_INVALID_ARG;
+
+    // Vorbis 解码会持续占用 CPU；定期让界面、触摸和空闲任务获得运行时间。
+    if (++ctx->chunks_since_yield >= 4) {
+        ctx->chunks_since_yield = 0;
+        vTaskDelay(1);
+    }
 
     ensure_lock();
 
@@ -209,6 +218,7 @@ static void player_task(void *arg)
         .mix_buffer = NULL,
         .mix_buffer_samples = 0,
         .skip_ms = (duration_ms > 0) ? (uint32_t)((duration_ms * seek_percent) / 100U) : 0,
+        .chunks_since_yield = 0,
     };
 
     esp_err_t ret = music_codec_decode_auto(file_path, playback_pcm_cb, &ctx);
@@ -295,14 +305,42 @@ esp_err_t music_player_play_selected(void)
     if (xSemaphoreTake(g_state.lock, pdMS_TO_TICKS(100)) != pdTRUE) {
         return ESP_ERR_TIMEOUT;
     }
+    if (g_state.task != NULL) {
+        xSemaphoreGive(g_state.lock);
+        return ESP_ERR_TIMEOUT;
+    }
     g_state.stop_requested = false;
     g_state.progress_percent = 0;
     g_state.played_ms = 0;
     g_state.duration_ms = 0;
     xSemaphoreGive(g_state.lock);
 
-    BaseType_t ok = xTaskCreate(player_task, "music_player", 8192, NULL, 5, &g_state.task);
+    BaseType_t ok = xTaskCreate(player_task, "music_player", 8192, NULL, 3, &g_state.task);
     return ok == pdPASS ? ESP_OK : ESP_FAIL;
+}
+
+static void music_control_task(void *arg)
+{
+    (void)arg;
+    while (true) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        esp_err_t err = music_player_play_selected();
+        if (err != ESP_OK) {
+            ESP_LOGW(TAG, "切换歌曲失败: %s", esp_err_to_name(err));
+        }
+    }
+}
+
+esp_err_t music_player_request_play_selected(void)
+{
+    if (!s_control_task) {
+        if (xTaskCreate(music_control_task, "music_control", 3072, NULL, 3,
+                        &s_control_task) != pdPASS) {
+            return ESP_ERR_NO_MEM;
+        }
+    }
+    xTaskNotifyGive(s_control_task);
+    return ESP_OK;
 }
 
 esp_err_t music_player_toggle_pause(void)
@@ -314,7 +352,7 @@ esp_err_t music_player_toggle_pause(void)
 
     if (!g_state.playing) {
         xSemaphoreGive(g_state.lock);
-        return music_player_play_selected();
+        return music_player_request_play_selected();
     }
 
     g_state.paused = !g_state.paused;
@@ -385,7 +423,7 @@ esp_err_t music_player_seek_percent(uint8_t percent)
     g_state.seek_pending = true;
     xSemaphoreGive(g_state.lock);
 
-    return music_player_play_selected();
+    return music_player_request_play_selected();
 }
 
 bool music_player_is_playing(void)
