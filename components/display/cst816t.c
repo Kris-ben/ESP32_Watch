@@ -323,8 +323,10 @@ esp_err_t cst816t_read_touch(cst816t_t *dev, cst816t_touch_data_t *data)
 
     data->x = x;
     data->y = y;
-    data->pressed = (data->finger_num > 0) && (data->event != CST816T_EVENT_LIFT_UP);
-
+    /* 单点芯片只有按下和持续接触表示有效触摸，NONE 不能刷新待机计时。 */
+    data->pressed = (data->finger_num == 1) &&
+                    (data->event == CST816T_EVENT_PRESS_DOWN ||
+                     data->event == CST816T_EVENT_CONTACT);
     return ESP_OK;
 }
 

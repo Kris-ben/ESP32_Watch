@@ -4,6 +4,7 @@
  */
 
 #include "sensors.h"
+#include "watch_standby.h"
 #include "mpu6050.h"
 #include "bmp280.h"
 #include "bm8563.h"
@@ -107,6 +108,7 @@ static void sensors_task(void *param)
     while (1) {
         // 读取MPU6050数据并更新步数
         if (mpu6050_read_data(&mpu_data) == ESP_OK) {
+            watch_standby_feed_motion(mpu_data.accel_x, mpu_data.accel_y, mpu_data.accel_z);
             uint32_t steps = step_counter_update(&step_counter, &mpu_data);
             __atomic_store_n(&g_step_count, steps, __ATOMIC_RELAXED);
             __atomic_store_n(&g_steps_valid, true, __ATOMIC_RELEASE);

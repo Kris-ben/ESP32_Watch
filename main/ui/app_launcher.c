@@ -1,4 +1,5 @@
 #include "app_launcher.h"
+#include "app_icons.h"
 
 #include <stdint.h>
 
@@ -19,16 +20,16 @@ typedef struct {
     const char *name;
     const char *detail;
     const lv_image_dsc_t *icon;
-    uint32_t accent;
+    uint32_t tile_bg;
 } app_item_t;
 
 static const app_item_t s_apps[APP_COUNT] = {
-    {"AI",   "语音助手", &_AI_RGB565A8_77x55,      0xa07bff},
-    {"天气", "查看预报", &_weather_RGB565A8_77x59, 0xf7bc63},
-    {"WiFi", "连接网络", &_WiFi2_RGB565A8_77x59,   0x63b8ff},
-    {"日历", "查看日期", &_rli_RGB565A8_77x55,     0x7dd9b0},
-    {"闹钟", "定时提醒", &_clock_RGB565A8_77x64,   0xff8c9c},
-    {"音乐", "本地播放", &_music_RGB565A8_77x66,   0x77c9ef},
+    {"AI",   "语音助手", &app_icon_ai,       0x393f61},
+    {"天气", "查看预报", &app_icon_weather,  0x484948},
+    {"WiFi", "连接网络", &app_icon_wifi,     0x324961},
+    {"日历", "查看日期", &app_icon_calendar, 0x324d54},
+    {"闹钟", "定时提醒", &app_icon_alarm,    0x484154},
+    {"音乐", "本地播放", &app_icon_music,    0x334c5e},
 };
 
 static void open_app(app_id_t id)
@@ -97,21 +98,20 @@ static void create_app_card(lv_obj_t *list, app_id_t id)
     lv_obj_add_event_cb(card, app_click_cb, LV_EVENT_CLICKED,
                         (void *)(uintptr_t)((unsigned)id + 1U));
 
-    lv_obj_t *accent = lv_obj_create(card);
-    lv_obj_set_pos(accent, 9, 10);
-    lv_obj_set_size(accent, 43, 43);
-    lv_obj_set_style_radius(accent, 10, 0);
-    lv_obj_set_style_bg_color(accent, lv_color_hex(item->accent), 0);
-    lv_obj_set_style_bg_opa(accent, LV_OPA_20, 0);
-    lv_obj_set_style_border_width(accent, 0, 0);
-    lv_obj_set_style_pad_all(accent, 0, 0);
-    lv_obj_remove_flag(accent, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_t *tile = lv_obj_create(card);
+    lv_obj_set_pos(tile, 9, 10);
+    lv_obj_set_size(tile, 44, 44);
+    lv_obj_set_style_radius(tile, 13, 0);
+    lv_obj_set_style_bg_color(tile, lv_color_hex(item->tile_bg), 0);
+    lv_obj_set_style_bg_opa(tile, LV_OPA_COVER, 0);
+    lv_obj_set_style_border_width(tile, 0, 0);
+    lv_obj_set_style_pad_all(tile, 0, 0);
+    lv_obj_remove_flag(tile, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
 
-    lv_obj_t *icon = lv_image_create(card);
+    lv_obj_t *icon = lv_image_create(tile);
     lv_image_set_src(icon, item->icon);
-    lv_image_set_pivot(icon, 0, 0);
-    lv_image_set_scale(icon, 140);
-    lv_obj_set_pos(icon, 9, 14);
+    lv_obj_remove_flag(icon, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(icon);
 
     lv_obj_t *name = lv_label_create(card);
     lv_label_set_text(name, item->name);

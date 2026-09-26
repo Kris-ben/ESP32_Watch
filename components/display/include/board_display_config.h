@@ -22,8 +22,8 @@
 #define BOARD_LCD_X_OFFSET        0
 #define BOARD_LCD_Y_OFFSET        0
 
-// SPI 时钟 - 降低频率避免条纹
-#define BOARD_LCD_SPI_FREQ_HZ     (20 * 1000 * 1000)
+// SPI 时钟：本板实测 30 MHz 画面正常。
+#define BOARD_LCD_SPI_FREQ_HZ     (30 * 1000 * 1000)
 
 // ST7789 模块选项（按 Request_Spark 工程默认）
 #define BOARD_LCD_INVERT_COLORS   1

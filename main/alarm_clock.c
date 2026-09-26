@@ -11,6 +11,7 @@
 #include "freertos/task.h"
 #include "max98357a.h"
 #include "system_settings.h"
+#include "watch_standby.h"
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
@@ -214,9 +215,11 @@ static void alarm_check_task(void *arg)
                 
                 last_triggered_minute = current_total_minutes;
                 g_is_ringing = true;
+                watch_standby_set_alarm_active(true);
                 
                 // 播放闹钟铃声
                 play_alarm_sound();
+                watch_standby_set_alarm_active(false);
                 
                 break;  // 一次只触发一个闹钟
             }
@@ -408,6 +411,7 @@ void alarm_save_from_roller(lv_ui *ui)
 void alarm_stop_ringing(void)
 {
     g_is_ringing = false;
+    watch_standby_set_alarm_active(false);
 }
 
 // 开关事件处理回调

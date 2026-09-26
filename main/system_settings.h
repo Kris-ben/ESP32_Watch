@@ -7,6 +7,7 @@
 #define SYSTEM_SETTINGS_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "esp_err.h"
 
 #ifdef __cplusplus
@@ -17,6 +18,9 @@ extern "C" {
  * @brief 初始化系统设置
  */
 esp_err_t system_settings_init(void);
+
+/* 临时熄屏，不改变保存的亮度。 */
+esp_err_t system_set_screen_blank(bool blank);
 
 /**
  * @brief 设置屏幕亮度

@@ -26,6 +26,7 @@
 #include "max98357a.h"
 #include "sensors.h"
 #include "system_settings.h"
+#include "watch_standby.h"
 #include "alarm_clock.h"
 #include "ai_chat/ai_chat_config.h"
 #include "wifi_connect.h"
@@ -178,6 +179,7 @@ static void lvgl_task(void *pvParameters)
             }
             
             delay_ms = lv_task_handler();
+            watch_standby_poll();
             xSemaphoreGive(lvgl_mutex);
         }
         if (delay_ms > 500) delay_ms = 500;
@@ -200,6 +202,10 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
     
     cst816t_touch_data_t touch_data;
     esp_err_t touch_err = board_touch_read(&touch_data);
+    if (watch_standby_touch(touch_err == ESP_OK && touch_data.pressed)) {
+        data->state = LV_INDEV_STATE_RELEASED;
+        return;
+    }
     if (touch_err == ESP_OK && touch_data.pressed) {
         uint16_t x = touch_data.x;
         uint16_t y = touch_data.y;
@@ -408,6 +414,8 @@ void app_main(void)
     // 覆盖 NVS 中的旧记录（否则会先去连上次配过的热点）
     ap_wifi_set(WIFI_SSID, WIFI_PASSWORD);
 #endif
+    watch_standby_init();
+
     // 启动 LVGL 任务
     xTaskCreate(lvgl_task, "lvgl", 8192, NULL, 4, NULL);
 

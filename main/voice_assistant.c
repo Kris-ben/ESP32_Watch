@@ -6,6 +6,7 @@
  */
 
 #include "voice_assistant.h"
+#include "watch_standby.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -103,6 +104,7 @@ static void on_dialog_event(voice_dialog_event_t event, const char *data, void *
 
     switch (event) {
     case VOICE_DIALOG_EVENT_WAKEUP:
+        watch_standby_set_voice_active(true);
         ESP_LOGI(TAG, "已唤醒，等待说话");
         voice_wake_overlay_show();
         voice_chat_popup_wake();
@@ -110,6 +112,7 @@ static void on_dialog_event(voice_dialog_event_t event, const char *data, void *
         ui_set_label(&s_ui->screen_AI_label_user, "");
         break;
     case VOICE_DIALOG_EVENT_SESSION_END:
+        watch_standby_set_voice_active(false);
         voice_wake_overlay_hide();
         voice_chat_popup_session_end();
         break;

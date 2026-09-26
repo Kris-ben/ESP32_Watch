@@ -10,6 +10,11 @@
 #include "board_display.h"
 #include "display_st7789v.h"
 #include "music_player.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+
+static SemaphoreHandle_t s_brightness_lock;
+static bool s_screen_blank;
 
 static const char *TAG = "SysSettings";
 
@@ -62,6 +67,9 @@ esp_err_t system_settings_init(void)
 {
     ESP_LOGI(TAG, "初始化系统设置...");
     
+    if (!s_brightness_lock) s_brightness_lock = xSemaphoreCreateMutex();
+    if (!s_brightness_lock) return ESP_ERR_NO_MEM;
+
     // 从NVS加载保存的设置
     load_settings_from_nvs();
     
@@ -80,17 +88,26 @@ esp_err_t system_preview_brightness(uint8_t percent)
     // 设置最小亮度防止全黑
     if (percent < 5) percent = 5;
     
-    // 获取display句柄并设置亮度
+    if (!s_brightness_lock) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_brightness_lock, portMAX_DELAY);
     display_st7789v_t *disp = board_display_get_display();
-    if (disp) {
-        esp_err_t err = display_st7789v_backlight_set_percent(disp, percent);
-        if (err != ESP_OK) {
-            ESP_LOGE(TAG, "设置亮度失败: %s", esp_err_to_name(err));
-            return err;
-        }
-    }
-    g_brightness = percent;
-    return ESP_OK;
+    esp_err_t err = disp ? display_st7789v_backlight_set_percent(
+        disp, s_screen_blank ? 0 : percent) : ESP_ERR_INVALID_STATE;
+    if (err == ESP_OK) g_brightness = percent;
+    xSemaphoreGive(s_brightness_lock);
+    return err;
+}
+
+esp_err_t system_set_screen_blank(bool blank)
+{
+    if (!s_brightness_lock) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_brightness_lock, portMAX_DELAY);
+    display_st7789v_t *disp = board_display_get_display();
+    esp_err_t err = disp ? display_st7789v_backlight_set_percent(
+        disp, blank ? 0 : g_brightness) : ESP_ERR_INVALID_STATE;
+    if (err == ESP_OK) s_screen_blank = blank;
+    xSemaphoreGive(s_brightness_lock);
+    return err;
 }
 
 esp_err_t system_set_brightness(uint8_t percent)
