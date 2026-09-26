@@ -1,4 +1,5 @@
 #include "ota_update_page.h"
+#include "ui_landscape.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -122,6 +123,8 @@ esp_err_t ota_update_page_show(void)
     lv_obj_set_style_text_align(close_text, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_center(close_text);
     lv_obj_add_event_cb(s_close_button, close_cb, LV_EVENT_CLICKED, NULL);
+
+    ui_landscape_apply(NULL, s_panel);
 
     s_last_progress = -1;
     s_last_message[0] = '\0';

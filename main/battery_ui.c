@@ -3,7 +3,7 @@
  * @brief 电池电量UI显示模块实现
  *
  * - 定期从 battery_monitor 读取电压，更新各页面的估算电量
- * - 使用 lv_obj_clean + lv_list_add_button 安全重建控件
+ * - 原位更新各页面的电池图标和百分比，避免定时刷新时闪动
  */
 
 #include "battery_ui.h"
@@ -20,6 +20,8 @@ static const char *TAG = "BATTERY_UI";
 #define BATTERY_UI_UPDATE_INTERVAL_MS   10000
 
 static lv_ui *s_ui = NULL;
+static bool s_cached_percentage_valid = false;
+static int s_cached_percentage = -1;
 extern SemaphoreHandle_t lvgl_mutex;
 
 const char *battery_ui_symbol_for_percentage(int percentage)
@@ -32,7 +34,7 @@ const char *battery_ui_symbol_for_percentage(int percentage)
 }
 
 /**
- * @brief 清空列表，重建按钮并应用样式
+ * @brief 更新现有列表按钮并应用样式
  *
  * @param list       列表对象 (screen_xxx_list_bettery)
  * @param item_ptr   按钮指针存储位置
@@ -48,14 +50,30 @@ static void battery_update_list(lv_obj_t *list, lv_obj_t **item_ptr,
     lv_obj_remove_flag(list, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(list, LV_OBJ_FLAG_GESTURE_BUBBLE);
 
-    /* 清除旧按钮 */
-    lv_obj_clean(list);
-
-    /* 重新创建按钮 */
-    lv_obj_t *btn = lv_list_add_button(list, icon, text);
+    lv_obj_t *btn = *item_ptr;
+    if (!btn || !lv_obj_is_valid(btn) || lv_obj_get_parent(btn) != list) {
+        btn = lv_list_add_button(list, NULL, text);
+        *item_ptr = btn;
+    }
     if (!btn) return;
 
-    lv_obj_set_size(btn, LV_PCT(100), 24);
+    lv_obj_t *icon_img = NULL;
+    for (uint32_t i = 0; i < lv_obj_get_child_count(btn); ++i) {
+        lv_obj_t *child = lv_obj_get_child(btn, i);
+        if (lv_obj_check_type(child, &lv_image_class)) {
+            icon_img = child;
+            break;
+        }
+    }
+    if (!icon_img) {
+        icon_img = lv_image_create(btn);
+        lv_obj_move_to_index(icon_img, 0);
+    }
+    lv_image_set_src(icon_img, icon);
+    lv_list_set_button_text(list, btn, text);
+
+    lv_obj_update_layout(list);
+    lv_obj_set_size(btn, LV_PCT(100), lv_obj_get_content_height(list));
     lv_obj_set_style_pad_all(btn, 0, 0);
     lv_obj_set_style_pad_column(btn, 2, 0);
     lv_obj_set_style_border_width(btn, 0, 0);
@@ -65,7 +83,53 @@ static void battery_update_list(lv_obj_t *list, lv_obj_t **item_ptr,
     lv_obj_remove_flag(btn, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_GESTURE_BUBBLE);
 
-    *item_ptr = btn;
+}
+
+static void battery_update_ai_list(lv_ui *ui, const char *icon, const char *text)
+{
+    battery_update_list(ui->screen_AI_list_battery,
+                        &ui->screen_AI_list_battery_item0, icon, text);
+    if (ui->screen_AI_list_battery && ui->screen_AI_list_battery_item0 &&
+        lv_obj_is_valid(ui->screen_AI_list_battery) &&
+        lv_obj_is_valid(ui->screen_AI_list_battery_item0) &&
+        lv_obj_get_parent(ui->screen_AI_list_battery_item0) == ui->screen_AI_list_battery) {
+        lv_obj_set_style_pad_all(ui->screen_AI_list_battery_item0, 1, 0);
+        lv_obj_set_style_bg_opa(ui->screen_AI_list_battery_item0, LV_OPA_TRANSP, 0);
+        lv_obj_set_style_border_width(ui->screen_AI_list_battery_item0, 0, 0);
+    }
+}
+
+void battery_ui_apply_cached_to_screen_nolock(lv_ui *ui, lv_obj_t *screen)
+{
+    if (!ui || !screen || !s_cached_percentage_valid) return;
+
+    char percentage_text[8];
+    int percentage = s_cached_percentage;
+    if (percentage > 100) percentage = 100;
+    if (percentage < 0) snprintf(percentage_text, sizeof(percentage_text), "--");
+    else snprintf(percentage_text, sizeof(percentage_text), "%d%%", percentage);
+    const char *icon = battery_ui_symbol_for_percentage(percentage);
+
+    if (screen == ui->screen_home) {
+        battery_update_list(ui->screen_home_list_bettery,
+                            &ui->screen_home_list_bettery_item0, icon, percentage_text);
+    } else if (screen == ui->screen_weather) {
+        battery_update_list(ui->screen_weather_list_bettery,
+                            &ui->screen_weather_list_bettery_item0, icon, percentage_text);
+    } else if (screen == ui->screen_wifi) {
+        battery_update_list(ui->screen_wifi_list_battery,
+                            &ui->screen_wifi_list_battery_item0, icon, percentage_text);
+    } else if (screen == ui->screen_AI) {
+        battery_update_ai_list(ui, icon, percentage_text);
+    } else if (screen == ui->screen_musiclist) {
+        battery_update_list(ui->screen_musiclist_list_battery,
+                            &ui->screen_musiclist_list_battery_item0, icon, percentage_text);
+    } else if (screen == ui->screen_play) {
+        battery_update_list(ui->screen_play_list_battery,
+                            &ui->screen_play_list_battery_item0, icon, percentage_text);
+        battery_update_list(ui->screen_play_list_3,
+                            &ui->screen_play_list_3_item0, icon, percentage_text);
+    }
 }
 
 /* ---- 更新逻辑 ---- */
@@ -82,6 +146,8 @@ static void battery_ui_apply_info_nolock(lv_ui *ui, const battery_info_t *info)
     if (percentage < 0) snprintf(percentage_text, sizeof(percentage_text), "--");
     else snprintf(percentage_text, sizeof(percentage_text), "%d%%", percentage);
     const char *icon = battery_ui_symbol_for_percentage(percentage);
+    s_cached_percentage = percentage;
+    s_cached_percentage_valid = true;
 
     battery_update_list(ui->screen_home_list_bettery,
                         &ui->screen_home_list_bettery_item0,
@@ -94,17 +160,7 @@ static void battery_ui_apply_info_nolock(lv_ui *ui, const battery_info_t *info)
     battery_update_list(ui->screen_wifi_list_battery,
                         &ui->screen_wifi_list_battery_item0,
                         icon, percentage_text);
-    battery_update_list(ui->screen_AI_list_battery,
-                        &ui->screen_AI_list_battery_item0,
-                        icon, percentage_text);
-    if (ui->screen_AI_list_battery && ui->screen_AI_list_battery_item0 &&
-        lv_obj_is_valid(ui->screen_AI_list_battery) &&
-        lv_obj_is_valid(ui->screen_AI_list_battery_item0) &&
-        lv_obj_get_parent(ui->screen_AI_list_battery_item0) == ui->screen_AI_list_battery) {
-        lv_obj_set_style_pad_all(ui->screen_AI_list_battery_item0, 1, 0);
-        lv_obj_set_style_bg_opa(ui->screen_AI_list_battery_item0, LV_OPA_TRANSP, 0);
-        lv_obj_set_style_border_width(ui->screen_AI_list_battery_item0, 0, 0);
-    }
+    battery_update_ai_list(ui, icon, percentage_text);
     battery_update_list(ui->screen_musiclist_list_battery,
                         &ui->screen_musiclist_list_battery_item0,
                         icon, percentage_text);

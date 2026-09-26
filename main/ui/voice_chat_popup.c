@@ -1,4 +1,5 @@
 #include "voice_chat_popup.h"
+#include "ui_landscape.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
@@ -26,7 +27,7 @@ static void glint_timer_cb(lv_timer_t *timer)
     if (s_glint_x >= 166 || s_glint_x <= 12) {
         s_glint_direction = -s_glint_direction;
     }
-    lv_obj_set_x(s_glint, s_glint_x);
+    lv_obj_set_x(s_glint, ui_landscape_scale_x(s_glint_x));
 }
 
 static bool ui_lock(void)
@@ -202,6 +203,8 @@ static void create_popup(void)
     lv_obj_set_style_text_opa(bubble_text, LV_OPA_COVER, 0);
     lv_obj_center(bubble_text);
     lv_obj_add_flag(s_bubble, LV_OBJ_FLAG_HIDDEN);
+    ui_landscape_apply_widget(s_panel);
+    ui_landscape_apply_widget(s_bubble);
 }
 
 void voice_chat_popup_wake(void)

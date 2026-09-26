@@ -7,9 +7,16 @@
 ## 硬件与环境
 
 - ESP32-S3，16 MB Flash，八线 PSRAM。
-- 240 × 284 ST7789V 显示屏和触摸屏；屏幕规格见仓库中的 `P183B001-V4-CTP.pdf`。
+- 物理屏幕为 240 × 284 的 ST7789V 显示屏和触摸屏；屏幕规格见仓库中的 `P183B001-V4-CTP.pdf`。
 - 音频相关功能使用 PDM 麦克风、MAX98357A 功放和 SD 卡。实际引脚以 `components/display/include/board_display_config.h`、`main/ai_chat/ai_chat_config.h` 与 `main/sd_spi_config.h` 为准。
 - 推荐 ESP-IDF 5.5.1。LVGL 及 `esp_lvgl_port` 由 `main/idf_component.yml` 和 `dependencies.lock` 管理。
+
+## 显示方向与本次更改
+
+- 当前固件将物理屏幕旋转 90°，画面按 **284 × 240 横屏**显示。实体屏幕、PCB 和 3D 打印外壳的摆放方向没有更换。
+- 触摸坐标同步交换 X/Y 并镜像两个方向，使触摸位置与横屏控件对应。
+- 原有竖屏页面在加载时转换为横屏布局；AI 动画、弹窗和快捷设置等后续更新的控件也使用横屏坐标。
+- 页面首次显示前同步最近的电量和 Wi-Fi 状态；电池图标与百分比原位刷新，首页和天气页的 Wi-Fi 图标位置已重新校准。
 
 ## 快速开始
 

@@ -6,6 +6,7 @@
 #include "guider_customer_fonts.h"
 #include "voice_assistant.h"
 #include "wifi_connect.h"
+#include "ui_landscape.h"
 
 typedef struct {
     lv_timer_t *timer;
@@ -64,6 +65,19 @@ static bool state_is_active(voice_dialog_state_t state)
            state == VOICE_DIALOG_SPEAKING;
 }
 
+static void motion_set_bar_geometry(ai_motion_t *motion, lv_obj_t *bar,
+                                    int32_t x, int32_t y, int32_t width, int32_t height)
+{
+    if (lv_obj_has_flag(lv_obj_get_screen(motion->ring), LV_OBJ_FLAG_USER_1)) {
+        x = ui_landscape_scale_x(x);
+        y = ui_landscape_scale_y(y);
+        width = ui_landscape_scale_x(width);
+        height = ui_landscape_scale_y(height);
+    }
+    lv_obj_set_size(bar, width, height);
+    lv_obj_set_pos(bar, x, y);
+}
+
 static void motion_draw_bars(ai_motion_t *motion, bool recolor)
 {
     static const uint8_t heights[4][5] = {
@@ -82,21 +96,20 @@ static void motion_draw_bars(ai_motion_t *motion, bool recolor)
             }
             int diameter = i == (motion->phase % 3) ? 9 : 6;
             lv_obj_remove_flag(bar, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_set_size(bar, diameter, diameter);
-            lv_obj_set_pos(bar, 17 + i * 13, 32 - diameter / 2);
+            motion_set_bar_geometry(motion, bar, 17 + i * 13, 32 - diameter / 2,
+                                    diameter, diameter);
             lv_obj_set_style_radius(bar, LV_RADIUS_CIRCLE, 0);
         } else if (state == VOICE_DIALOG_RECORDING || state == VOICE_DIALOG_WAKEUP ||
                    state == VOICE_DIALOG_SPEAKING) {
             int index = state == VOICE_DIALOG_SPEAKING ? 4 - i : i;
             int height = heights[motion->phase % 4][index];
             lv_obj_remove_flag(bar, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_set_size(bar, 5, height);
-            lv_obj_set_pos(bar, 12 + i * 9, (64 - height) / 2);
+            motion_set_bar_geometry(motion, bar, 12 + i * 9, (64 - height) / 2,
+                                    5, height);
             lv_obj_set_style_radius(bar, 3, 0);
         } else if (i == 2) {
             lv_obj_remove_flag(bar, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_set_size(bar, 13, 13);
-            lv_obj_set_pos(bar, 25, 25);
+            motion_set_bar_geometry(motion, bar, 25, 25, 13, 13);
             lv_obj_set_style_radius(bar, LV_RADIUS_CIRCLE, 0);
         } else {
             lv_obj_add_flag(bar, LV_OBJ_FLAG_HIDDEN);
@@ -191,6 +204,10 @@ void ai_status_page_configure(lv_ui *ui)
     lv_obj_set_style_bg_opa(ui->screen_AI_list_battery, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(ui->screen_AI_list_battery, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_AI_list_battery, 0, 0);
+    // 生成的初始电池按钮带黑底；后台电量刷新前也要保持透明。
+    lv_obj_set_style_bg_opa(ui->screen_AI_list_battery_item0, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(ui->screen_AI_list_battery_item0, 0, 0);
+    lv_obj_set_style_pad_all(ui->screen_AI_list_battery_item0, 1, 0);
 
     lv_obj_t *wifi_icon = lv_label_create(screen);
     lv_obj_set_pos(wifi_icon, 138, 5);

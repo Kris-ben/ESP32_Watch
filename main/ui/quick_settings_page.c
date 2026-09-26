@@ -1,4 +1,5 @@
 #include "quick_settings_page.h"
+#include "ui_landscape.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -323,6 +324,8 @@ void quick_settings_page_open(lv_ui *ui)
     lv_obj_t *hint = add_label(s_panel, 80, 266, 80, 15,
                                "上滑收起", false, 0x7790aa);
     lv_obj_set_style_text_align(hint, LV_TEXT_ALIGN_CENTER, 0);
+
+    ui_landscape_apply(NULL, s_panel);
 
     refresh_status(NULL);
     s_status_timer = lv_timer_create(refresh_status, 1000, NULL);

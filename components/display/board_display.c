@@ -26,7 +26,7 @@ esp_err_t board_display_init(void)
         .height = BOARD_LCD_HEIGHT,
         .x_offset = BOARD_LCD_X_OFFSET,
         .y_offset = BOARD_LCD_Y_OFFSET,
-        .rotation = ST7789V_ROTATION_0,
+        .rotation = ST7789V_ROTATION_90,
         .spi_clock_hz = BOARD_LCD_SPI_FREQ_HZ,
 
         .invert_colors = (BOARD_LCD_INVERT_COLORS != 0),

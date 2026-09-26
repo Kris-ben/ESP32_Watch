@@ -12,6 +12,9 @@
 #include "gui_guider.h"
 #include "widgets_init.h"
 #include "quick_settings_page.h"
+#include "ui_landscape.h"
+#include "battery_ui.h"
+#include "wifi_connect.h"
 
 void ui_init_style(lv_style_t * style)
 {
@@ -38,6 +41,10 @@ void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, boo
     if (new_scr_del) {
         setup_scr(ui);
     }
+    ui_landscape_apply(ui, *new_scr);
+    // 页面首帧先填入已知状态，避免生成器的占位电量和默认 WiFi 图片闪现。
+    battery_ui_apply_cached_to_screen_nolock(ui, *new_scr);
+    wifi_connect_update_icon_nolock(ui, wifi_connect_is_connected());
     if (new_scr == &ui->screen_home) {
         ui->screen_home_del = false;
     }
@@ -117,6 +124,7 @@ void setup_ui(lv_ui *ui)
     init_scr_del_flag(ui);
     init_keyboard(ui);
     setup_scr_screen_home(ui);
+    ui_landscape_apply(ui, ui->screen_home);
     ui->screen_home_del = false;
     lv_screen_load(ui->screen_home);
     quick_settings_page_bind(ui);

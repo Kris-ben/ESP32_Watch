@@ -211,8 +211,6 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
         uint16_t y = touch_data.y;
         if (x >= BOARD_LCD_WIDTH) x = BOARD_LCD_WIDTH - 1;
         if (y >= BOARD_LCD_HEIGHT) y = BOARD_LCD_HEIGHT - 1;
-        y = BOARD_LCD_HEIGHT - 1 - y;  // Y轴反转
-        
         data->point.x = x;
         data->point.y = y;
         data->state = LV_INDEV_STATE_PRESSED;

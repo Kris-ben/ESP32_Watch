@@ -31,6 +31,9 @@ const char *battery_ui_symbol_for_percentage(int percentage);
  */
 void battery_ui_update_nolock(lv_ui *ui);
 
+/** @brief 页面首次显示前，用最近一次采样值填充该页电池区域；须在 LVGL 线程中调用。 */
+void battery_ui_apply_cached_to_screen_nolock(lv_ui *ui, lv_obj_t *screen);
+
 /**
  * @brief 立即刷新电池UI（加锁，可在任意任务中调用）
  */

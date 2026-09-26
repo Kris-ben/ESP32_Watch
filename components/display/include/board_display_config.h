@@ -15,10 +15,9 @@
 #define BOARD_LCD_PIN_RST         38
 #define BOARD_LCD_PIN_BL          19
 
-// 分辨率与偏移（P183B001-V4-CTP 1.83inch LCD Rev2）
-// Rev2: 240x284 (ST7789P)
-#define BOARD_LCD_WIDTH           240
-#define BOARD_LCD_HEIGHT          284
+// 屏幕玻璃原生为 240x284；界面旋转 90° 后的逻辑分辨率为 284x240。
+#define BOARD_LCD_WIDTH           284
+#define BOARD_LCD_HEIGHT          240
 #define BOARD_LCD_X_OFFSET        0
 #define BOARD_LCD_Y_OFFSET        0
 
@@ -40,7 +39,7 @@
 #define BOARD_TOUCH_PIN_INT       39
 #define BOARD_TOUCH_I2C_FREQ_HZ   400000
 
-// 触摸坐标变换（按 Request_Spark 现状：驱动层不做转换）
-#define BOARD_TOUCH_SWAP_XY       0
-#define BOARD_TOUCH_MIRROR_X      0
-#define BOARD_TOUCH_MIRROR_Y      0
+// 触摸芯片仍输出原生方向坐标；横屏时交换 X/Y，再按实机方向翻转两轴。
+#define BOARD_TOUCH_SWAP_XY       1
+#define BOARD_TOUCH_MIRROR_X      1
+#define BOARD_TOUCH_MIRROR_Y      1
