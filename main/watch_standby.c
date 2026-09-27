@@ -3,6 +3,7 @@
 #include "esp_timer.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
+#include "esp_wifi.h"
 
 #define IDLE_US (30LL * 1000000)
 #define SHAKE_WINDOW_US 900000
@@ -12,6 +13,7 @@ static portMUX_TYPE s_lock = portMUX_INITIALIZER_UNLOCKED;
 static int64_t s_last_activity;
 static bool s_voice_active;
 static bool s_alarm_active;
+static bool s_timer_alert_active;
 static bool s_ready;
 /* 以下状态仅由 LVGL 任务访问。 */
 static bool s_asleep;
@@ -50,6 +52,22 @@ void watch_standby_set_alarm_active(bool active)
     portEXIT_CRITICAL(&s_lock);
 }
 
+void watch_standby_set_timer_alert_active(bool active)
+{
+    portENTER_CRITICAL(&s_lock);
+    s_timer_alert_active = active;
+    s_last_activity = esp_timer_get_time();
+    portEXIT_CRITICAL(&s_lock);
+}
+
+bool watch_standby_is_screen_blank(void)
+{
+    portENTER_CRITICAL(&s_lock);
+    bool blank = s_asleep;
+    portEXIT_CRITICAL(&s_lock);
+    return blank;
+}
+
 bool watch_standby_touch(bool pressed)
 {
     if (!pressed) {
@@ -77,12 +95,24 @@ void watch_standby_poll(void)
 {
     portENTER_CRITICAL(&s_lock);
     bool sleep = s_ready && !s_voice_active && !s_alarm_active &&
+                 !s_timer_alert_active &&
                  esp_timer_get_time() - s_last_activity >= IDLE_US;
     portEXIT_CRITICAL(&s_lock);
     if (sleep == s_asleep) return;
     esp_err_t err = system_set_screen_blank(sleep);
     if (err == ESP_OK) {
+        portENTER_CRITICAL(&s_lock);
         s_asleep = sleep;
+        portEXIT_CRITICAL(&s_lock);
+        /* 息屏时延长 Wi-Fi 监听间隔；亮屏恢复默认省电档以减小交互延迟。 */
+        wifi_mode_t wifi_mode;
+        if (esp_wifi_get_mode(&wifi_mode) == ESP_OK && wifi_mode == WIFI_MODE_STA) {
+            esp_err_t wifi_err = esp_wifi_set_ps(sleep ? WIFI_PS_MAX_MODEM :
+                                                        WIFI_PS_MIN_MODEM);
+            if (wifi_err != ESP_OK) {
+                ESP_LOGW("Standby", "Wi-Fi power save: %s", esp_err_to_name(wifi_err));
+            }
+        }
         ESP_LOGI("Standby", "%s", sleep ? "Screen off after 30s idle" : "Screen awake");
     } else {
         static int64_t last_error_log;
@@ -96,6 +126,7 @@ void watch_standby_poll(void)
 
 void watch_standby_feed_motion(float x, float y, float z)
 {
+    if (watch_standby_is_screen_blank()) return;
     /* 两个独立加速度峰才算摇动，回落后重新武装，过滤单次磕碰。 */
     static bool armed = true;
     static int64_t first_peak;

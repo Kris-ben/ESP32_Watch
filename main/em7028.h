@@ -39,6 +39,9 @@ esp_err_t em7028_read_pid(em7028_dev_t *dev, uint8_t *pid);
  */
 esp_err_t em7028_read_hrs1_raw(em7028_dev_t *dev, uint16_t *raw);
 
+/* 关闭 HRS1 会同时关闭该模式使用的 LED1；再次启用后继续读波形。 */
+esp_err_t em7028_set_hrs1_enabled(em7028_dev_t *dev, bool enabled);
+
 #ifdef __cplusplus
 }
 #endif

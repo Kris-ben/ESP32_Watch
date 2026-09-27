@@ -201,6 +201,8 @@ esp_err_t bm8563_get_time(bm8563_handle_t *handle, bm8563_time_t *time)
     if (ret != ESP_OK) {
         return ret;
     }
+    // VL 置位表示 RTC 曾低压，寄存器中的时间不能直接信任。
+    if (time_buf[0] & BM8563_VL_FLAG) return ESP_ERR_INVALID_STATE;
     
     // 转换为十进制格式
     time->second = bm8563_bcd_to_dec(time_buf[0] & 0x7F);
@@ -210,6 +212,10 @@ esp_err_t bm8563_get_time(bm8563_handle_t *handle, bm8563_time_t *time)
     time->weekday = time_buf[4] & 0x07;
     time->month = bm8563_bcd_to_dec(time_buf[5] & 0x1F);
     time->year = bm8563_bcd_to_dec(time_buf[6]);
+    if (time->second > 59 || time->minute > 59 || time->hour > 23 ||
+        time->day < 1 || time->day > 31 || time->weekday > 6 ||
+        time->month < 1 || time->month > 12 || time->year > 99)
+        return ESP_ERR_INVALID_STATE;
     
     return ESP_OK;
 }

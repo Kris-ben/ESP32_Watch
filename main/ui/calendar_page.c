@@ -1,8 +1,10 @@
 #include "calendar_page.h"
 
 #include <stdio.h>
+#include <stdint.h>
 #include <time.h>
 
+#include "clock_setting.h"
 #include "guider_customer_fonts.h"
 #include "lvgl.h"
 
@@ -26,6 +28,9 @@ struct calendar_page {
     lv_obj_t *month_label;
     lv_obj_t *detail_label;
     lv_obj_t *previous_button;
+    lv_obj_t *setting_panel;
+    lv_obj_t *setting_values[5];
+    lv_obj_t *setting_save_label;
     lv_timer_t *timer;
     calendar_cell_t cells[42];
     int year;
@@ -34,6 +39,7 @@ struct calendar_page {
     int today_year;
     int today_month;
     int today_day;
+    int setting[5];
 };
 
 static const char *const s_weekdays[] = {
@@ -197,6 +203,122 @@ static void today_clicked_cb(lv_event_t *event)
     render(page);
 }
 
+static void setting_refresh(calendar_page_t *page)
+{
+    for (int i = 0; i < 5; ++i) {
+        if (page->setting_values[i]) {
+            lv_label_set_text_fmt(page->setting_values[i], i == 0 ? "%04d" : "%02d",
+                                  page->setting[i]);
+        }
+    }
+}
+
+static void setting_adjust_cb(lv_event_t *event)
+{
+    calendar_page_t *page = lv_event_get_user_data(event);
+    int action = (int)(intptr_t)lv_obj_get_user_data(lv_event_get_current_target_obj(event));
+    int field = action / 2;
+    int step = action % 2 == 0 ? 1 : -1;
+    int *value = &page->setting[field];
+    static const int minimum[] = {2024, 1, 1, 0, 0};
+    static const int maximum[] = {2099, 12, 31, 23, 59};
+    int upper = field == 2 ? days_in_month(page->setting[0], page->setting[1])
+                           : maximum[field];
+    *value += step;
+    if (*value > upper) *value = minimum[field];
+    if (*value < minimum[field]) *value = upper;
+    int last_day = days_in_month(page->setting[0], page->setting[1]);
+    if (page->setting[2] > last_day) page->setting[2] = last_day;
+    setting_refresh(page);
+    lv_label_set_text(page->setting_save_label, "保存到 RTC");
+}
+
+static void setting_close_cb(lv_event_t *event)
+{
+    calendar_page_t *page = lv_event_get_user_data(event);
+    lv_obj_delete(page->setting_panel);
+    page->setting_panel = NULL;
+    for (int i = 0; i < 5; ++i) page->setting_values[i] = NULL;
+    page->setting_save_label = NULL;
+}
+
+static void setting_save_cb(lv_event_t *event)
+{
+    calendar_page_t *page = lv_event_get_user_data(event);
+    bool rtc_saved = false;
+    esp_err_t err = clock_setting_set_local(page->setting[0], page->setting[1],
+                                            page->setting[2], page->setting[3],
+                                            page->setting[4], &rtc_saved);
+    if (err != ESP_OK) {
+        lv_label_set_text(page->setting_save_label, "日期无效");
+        return;
+    }
+    lv_label_set_text(page->setting_save_label,
+                      rtc_saved ? "已保存到 RTC" : "仅本次有效");
+    refresh_today(page);
+    page->year = page->today_year;
+    page->month = page->today_month;
+    page->selected_day = page->today_day;
+    render(page);
+}
+
+static void setting_open_cb(lv_event_t *event)
+{
+    calendar_page_t *page = lv_event_get_user_data(event);
+    if (page->setting_panel) return;
+    time_t now = time(NULL);
+    struct tm local;
+    if (!localtime_r(&now, &local)) return;
+    page->setting[0] = local.tm_year + 1900;
+    if (page->setting[0] < 2024 || page->setting[0] > 2099) page->setting[0] = 2024;
+    page->setting[1] = local.tm_mon + 1;
+    page->setting[2] = local.tm_mday;
+    page->setting[3] = local.tm_hour;
+    page->setting[4] = local.tm_min;
+
+    int width = lv_obj_get_width(page->screen);
+    int height = lv_obj_get_height(page->screen);
+    lv_obj_t *panel = lv_obj_create(page->screen);
+    page->setting_panel = panel;
+    lv_obj_set_pos(panel, 0, 0);
+    lv_obj_set_size(panel, width, height);
+    lv_obj_set_style_bg_color(panel, lv_color_hex(CAL_BG), 0);
+    lv_obj_set_style_bg_opa(panel, LV_OPA_COVER, 0);
+    lv_obj_set_style_border_width(panel, 0, 0);
+    lv_obj_set_style_pad_all(panel, 0, 0);
+    lv_obj_remove_flag(panel, LV_OBJ_FLAG_SCROLLABLE);
+
+    make_label(panel, 12, 13, 140, 30, "离线校时", true, CAL_TEXT);
+    lv_obj_t *close = make_button(panel, width - 70, 9, 60, 32, CAL_CARD);
+    make_label(close, 0, 8, 60, 18, "关闭", false, CAL_TEXT);
+    lv_obj_add_event_cb(close, setting_close_cb, LV_EVENT_CLICKED, page);
+
+    static const char *const field_names[] = {"年", "月", "日", "时", "分"};
+    int column_width = (width - 12) / 5;
+    for (int i = 0; i < 5; ++i) {
+        int x = 6 + i * column_width;
+        int button_width = column_width - 4;
+        make_label(panel, x, 55, button_width, 20, field_names[i], false, CAL_MUTED);
+        lv_obj_t *plus = make_button(panel, x, 77, button_width, 34, CAL_CARD);
+        make_label(plus, 0, 6, button_width, 22, "+", true, CAL_TEXT);
+        lv_obj_set_user_data(plus, (void *)(intptr_t)(i * 2));
+        lv_obj_add_event_cb(plus, setting_adjust_cb, LV_EVENT_CLICKED, page);
+        page->setting_values[i] = make_label(panel, x, 116, button_width, 28,
+                                             "--", true, CAL_TEXT);
+        lv_obj_t *minus = make_button(panel, x, 149, button_width, 34, CAL_CARD);
+        make_label(minus, 0, 6, button_width, 22, "-", true, CAL_TEXT);
+        lv_obj_set_user_data(minus, (void *)(intptr_t)(i * 2 + 1));
+        lv_obj_add_event_cb(minus, setting_adjust_cb, LV_EVENT_CLICKED, page);
+    }
+    setting_refresh(page);
+
+    lv_obj_t *save = make_button(panel, width / 2 - 58, height - 40,
+                                 116, 34, CAL_ACCENT);
+    page->setting_save_label = make_label(save, 0, 8, 116, 20,
+                                           "保存到 RTC", false, CAL_TEXT);
+    lv_obj_add_event_cb(save, setting_save_cb, LV_EVENT_CLICKED, page);
+}
+
 static void timer_cb(lv_timer_t *timer)
 {
     calendar_page_t *page = lv_timer_get_user_data(timer);
@@ -227,6 +349,9 @@ void calendar_page_init(lv_ui *ui)
     lv_obj_t *title = make_label(page->screen, 10, 11, 80, 27,
                                  "日历", true, CAL_TEXT);
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_LEFT, 0);
+    lv_obj_t *setting = make_button(page->screen, 95, 8, 70, 30, CAL_CARD);
+    make_label(setting, 0, 7, 70, 18, "校时", false, CAL_TEXT);
+    lv_obj_add_event_cb(setting, setting_open_cb, LV_EVENT_CLICKED, page);
     lv_obj_t *today = make_button(page->screen, 174, 8, 56, 30, CAL_CARD);
     make_label(today, 0, 7, 56, 18, "回今天", false, 0x83d9c8);
     lv_obj_add_event_cb(today, today_clicked_cb, LV_EVENT_CLICKED, page);

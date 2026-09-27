@@ -27,6 +27,8 @@
 #include "sensors.h"
 #include "system_settings.h"
 #include "watch_standby.h"
+#include "time_tools.h"
+#include "time_tools_page.h"
 #include "alarm_clock.h"
 #include "ai_chat/ai_chat_config.h"
 #include "wifi_connect.h"
@@ -143,12 +145,10 @@ static void lvgl_flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px
     lv_display_flush_ready(disp);
 }
 
-/**
- * @brief LVGL 定时器回调
- */
-static void lvgl_tick_cb(void *arg)
+/* 直接读取单调时钟，避免独立定时器每 2 ms 唤醒 CPU。 */
+static uint32_t lvgl_tick_now_ms(void)
 {
-    lv_tick_inc(2);
+    return (uint32_t)(esp_timer_get_time() / 1000);
 }
 
 /**
@@ -179,11 +179,16 @@ static void lvgl_task(void *pvParameters)
             }
             
             delay_ms = lv_task_handler();
+            if (time_tools_countdown_poll()) {
+                time_tools_page_show_finished();
+            }
+            if (!watch_standby_is_screen_blank()) time_tools_page_update();
             watch_standby_poll();
             xSemaphoreGive(lvgl_mutex);
         }
         if (delay_ms > 500) delay_ms = 500;
         if (delay_ms < 1) delay_ms = 1;
+        if (watch_standby_is_screen_blank() && delay_ms < 30) delay_ms = 30;
         TickType_t delay_ticks = pdMS_TO_TICKS(delay_ms);
         vTaskDelay(delay_ticks > 0 ? delay_ticks : 1);
     }
@@ -359,6 +364,7 @@ void app_main(void)
     // 初始化 LVGL
     ESP_LOGI(TAG, "Init LVGL...");
     lv_init();
+    lv_tick_set_cb(lvgl_tick_now_ms);
     
     lv_display_t *disp = lv_display_create(BOARD_LCD_WIDTH, BOARD_LCD_HEIGHT);
     lv_display_set_flush_cb(disp, lvgl_flush_cb);
@@ -377,12 +383,6 @@ void app_main(void)
         return;
     }
     lv_display_set_buffers(disp, buf1, NULL, buf_bytes, LV_DISPLAY_RENDER_MODE_PARTIAL);
-    
-    // LVGL 定时器
-    const esp_timer_create_args_t timer_args = { .callback = &lvgl_tick_cb, .name = "lvgl_tick" };
-    esp_timer_handle_t lvgl_timer = NULL;
-    ESP_ERROR_CHECK(esp_timer_create(&timer_args, &lvgl_timer));
-    ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_timer, 2000));
     
     lvgl_mutex = xSemaphoreCreateMutex();
     

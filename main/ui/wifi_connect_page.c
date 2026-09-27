@@ -3,6 +3,62 @@
 #include "guider_customer_fonts.h"
 #include "wifi_connect.h"
 
+#include <string.h>
+
+#define WIFI_KEY(width) (LV_BUTTONMATRIX_CTRL_POPOVER | (width))
+
+// 首行缩短字母键的权重，把最右侧退格键的触摸区域从约 38 px 扩至约 66 px。
+static const lv_buttonmatrix_ctrl_t wifi_text_keyboard_ctrl[] = {
+    LV_KEYBOARD_CTRL_BUTTON_FLAGS | 3,
+    WIFI_KEY(2), WIFI_KEY(2), WIFI_KEY(2), WIFI_KEY(2), WIFI_KEY(2),
+    WIFI_KEY(2), WIFI_KEY(2), WIFI_KEY(2), WIFI_KEY(2), WIFI_KEY(2),
+    LV_BUTTONMATRIX_CTRL_CHECKED | 7,
+    LV_KEYBOARD_CTRL_BUTTON_FLAGS | 6,
+    WIFI_KEY(3), WIFI_KEY(3), WIFI_KEY(3), WIFI_KEY(3), WIFI_KEY(3),
+    WIFI_KEY(3), WIFI_KEY(3), WIFI_KEY(3), WIFI_KEY(3),
+    LV_BUTTONMATRIX_CTRL_CHECKED | 7,
+    LV_BUTTONMATRIX_CTRL_CHECKED | WIFI_KEY(1),
+    LV_BUTTONMATRIX_CTRL_CHECKED | WIFI_KEY(1),
+    WIFI_KEY(1), WIFI_KEY(1), WIFI_KEY(1), WIFI_KEY(1),
+    WIFI_KEY(1), WIFI_KEY(1), WIFI_KEY(1),
+    LV_BUTTONMATRIX_CTRL_CHECKED | WIFI_KEY(1),
+    LV_BUTTONMATRIX_CTRL_CHECKED | WIFI_KEY(1),
+    LV_BUTTONMATRIX_CTRL_CHECKED | WIFI_KEY(1),
+    LV_KEYBOARD_CTRL_BUTTON_FLAGS | 2,
+    LV_BUTTONMATRIX_CTRL_CHECKED | 2,
+    6,
+    LV_BUTTONMATRIX_CTRL_CHECKED | 2,
+    LV_KEYBOARD_CTRL_BUTTON_FLAGS | 2,
+};
+
+static bool wifi_text_map_matches(const char * const map[], const char *letter)
+{
+    if (!map) return false;
+    size_t buttons = 0;
+    for (size_t i = 0; map[i] && map[i][0]; ++i) {
+        if (strcmp(map[i], "\n") != 0) ++buttons;
+    }
+    return buttons == sizeof(wifi_text_keyboard_ctrl) / sizeof(wifi_text_keyboard_ctrl[0]) &&
+           strcmp(map[10], letter) == 0 &&
+           strcmp(map[11], LV_SYMBOL_BACKSPACE) == 0;
+}
+
+static void configure_wifi_password_keyboard(lv_obj_t *keyboard)
+{
+    const char * const *lower = lv_keyboard_get_map_array(keyboard);
+    lv_keyboard_set_mode(keyboard, LV_KEYBOARD_MODE_TEXT_UPPER);
+    const char * const *upper = lv_keyboard_get_map_array(keyboard);
+    lv_keyboard_set_mode(keyboard, LV_KEYBOARD_MODE_TEXT_LOWER);
+    if (!wifi_text_map_matches(lower, "p") || !wifi_text_map_matches(upper, "P")) return;
+
+    lv_keyboard_set_map(keyboard, LV_KEYBOARD_MODE_TEXT_LOWER,
+                        lower, wifi_text_keyboard_ctrl);
+    lv_keyboard_set_map(keyboard, LV_KEYBOARD_MODE_TEXT_UPPER,
+                        upper, wifi_text_keyboard_ctrl);
+}
+
+#undef WIFI_KEY
+
 typedef struct {
     lv_ui *ui;
     lv_obj_t *status;
@@ -202,6 +258,7 @@ void wifi_connect_page_init(lv_ui *ui)
                                &lv_customer_font_ZiTiQuanWeiJunHeiW22_18, 0);
 
     if (ui->g_kb_top_layer) {
+        configure_wifi_password_keyboard(ui->g_kb_top_layer);
         lv_obj_set_height(ui->g_kb_top_layer, 156);
         lv_obj_align(ui->g_kb_top_layer, LV_ALIGN_BOTTOM_MID, 0, 0);
     }

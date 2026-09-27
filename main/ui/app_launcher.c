@@ -1,5 +1,6 @@
 #include "app_launcher.h"
 #include "app_icons.h"
+#include "time_tools_page.h"
 
 #include <stdint.h>
 
@@ -13,6 +14,7 @@ typedef enum {
     APP_CALENDAR,
     APP_ALARM,
     APP_MUSIC,
+    APP_TIME_TOOLS,
     APP_COUNT
 } app_id_t;
 
@@ -30,6 +32,7 @@ static const app_item_t s_apps[APP_COUNT] = {
     {"日历", "查看日期", &app_icon_calendar, 0x324d54},
     {"闹钟", "定时提醒", &app_icon_alarm,    0x484154},
     {"音乐", "本地播放", &app_icon_music,    0x334c5e},
+    {"计时", "倒计时和秒表", &app_icon_timer, 0x50443b},
 };
 
 static void open_app(app_id_t id)
@@ -65,6 +68,9 @@ static void open_app(app_id_t id)
         ui_load_scr_animation(ui, &ui->screen_musiclist, ui->screen_musiclist_del,
                               &ui->screen_1_del, setup_scr_screen_musiclist,
                               LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, false, true);
+        break;
+    case APP_TIME_TOOLS:
+        time_tools_page_open();
         break;
     default:
         break;

@@ -134,3 +134,17 @@ esp_err_t em7028_read_hrs1_raw(em7028_dev_t *dev, uint16_t *raw)
     *raw = (count > 0) ? (uint16_t)(sum / count) : 0;
     return ESP_OK;
 }
+
+esp_err_t em7028_set_hrs1_enabled(em7028_dev_t *dev, bool enabled)
+{
+    if (!dev) return ESP_ERR_INVALID_ARG;
+    if (!dev->initialized) return ESP_ERR_INVALID_STATE;
+
+    uint8_t config = 0;
+    esp_err_t err = em7028_read_reg(dev, EM7028_REG_CONFIG, &config, 1);
+    if (err != ESP_OK) return err;
+    uint8_t next = enabled ? (config | EM7028_CONFIG_HRS1_EN) :
+                             (config & (uint8_t)~EM7028_CONFIG_HRS1_EN);
+    if (next == config) return ESP_OK;
+    return em7028_write_reg(dev, EM7028_REG_CONFIG, next);
+}

@@ -26,6 +26,7 @@ extern SemaphoreHandle_t lvgl_mutex;
 
 // BMP280设备实例
 static bmp280_dev_t bmp280_dev;
+static bool g_bmp280_ready = false;
 
 // BM8563 RTC设备实例
 static bm8563_handle_t rtc_handle;
@@ -99,6 +100,7 @@ static void sensors_task(void *param)
 {
     mpu6050_data_t mpu_data;
     float temperature, pressure;
+    bool previous_blank = false;
     
     ESP_LOGI(TAG, "传感器任务启动");
     
@@ -106,6 +108,20 @@ static void sensors_task(void *param)
     vTaskDelay(pdMS_TO_TICKS(1000));
     
     while (1) {
+        bool screen_blank = watch_standby_is_screen_blank();
+        if (screen_blank != previous_blank) {
+            if (g_bmp280_ready) {
+                esp_err_t err = bmp280_set_mode(&bmp280_dev, screen_blank ?
+                                                 BMP280_MODE_SLEEP : BMP280_MODE_NORMAL);
+                if (err != ESP_OK) ESP_LOGW(TAG, "BMP280待机切换失败: %s", esp_err_to_name(err));
+            }
+            if (g_em7028_ready) {
+                esp_err_t err = em7028_set_hrs1_enabled(&em7028_dev, !screen_blank);
+                if (err != ESP_OK) ESP_LOGW(TAG, "EM7028待机切换失败: %s", esp_err_to_name(err));
+            }
+            if (screen_blank) g_heart_rate_valid = false;
+            previous_blank = screen_blank;
+        }
         // 读取MPU6050数据并更新步数
         if (mpu6050_read_data(&mpu_data) == ESP_OK) {
             watch_standby_feed_motion(mpu_data.accel_x, mpu_data.accel_y, mpu_data.accel_z);
@@ -117,39 +133,41 @@ static void sensors_task(void *param)
             ESP_LOGW(TAG, "MPU6050读取失败");
         }
         
-        // 读取BMP280气压数据
-        if (bmp280_read_data(&bmp280_dev, &temperature, &pressure) == ESP_OK) {
-            g_pressure = pressure;
-            g_sensors_valid = true;
+        // 息屏后继续计步，暂停不需要持续刷新的气压、心率和页面更新。
+        if (screen_blank) {
+            g_heart_rate_valid = false;
         } else {
-            ESP_LOGW(TAG, "BMP280读取失败");
-        }
-
-        // 读取EM7028心率原始波形
-        if (g_em7028_ready) {
-            uint16_t heart_raw = 0;
-            if (em7028_read_hrs1_raw(&em7028_dev, &heart_raw) == ESP_OK) {
-                static TickType_t last_heart_log_tick = 0;
-                g_heart_raw = heart_raw;
-                heart_rate_update_from_raw(heart_raw);
-                TickType_t now_tick = xTaskGetTickCount();
-                if (now_tick - last_heart_log_tick >= pdMS_TO_TICKS(1000)) {
-                    ESP_LOGI(TAG, "EM7028 raw=%u, bpm=%u, valid=%d",
-                             (unsigned int)g_heart_raw,
-                             (unsigned int)g_heart_rate_bpm,
-                             g_heart_rate_valid);
-                    last_heart_log_tick = now_tick;
-                }
+            if (bmp280_read_data(&bmp280_dev, &temperature, &pressure) == ESP_OK) {
+                g_pressure = pressure;
                 g_sensors_valid = true;
             } else {
-                g_heart_rate_valid = false;
-                ESP_LOGW(TAG, "EM7028读取失败");
+                ESP_LOGW(TAG, "BMP280读取失败");
             }
-        }
-        
-        // 更新UI（每500ms更新一次）
-        if (g_sensors_valid) {
-            update_home_sensors(&guider_ui);
+
+            if (g_em7028_ready) {
+                uint16_t heart_raw = 0;
+                if (em7028_read_hrs1_raw(&em7028_dev, &heart_raw) == ESP_OK) {
+                    static TickType_t last_heart_log_tick = 0;
+                    g_heart_raw = heart_raw;
+                    heart_rate_update_from_raw(heart_raw);
+                    TickType_t now_tick = xTaskGetTickCount();
+                    if (now_tick - last_heart_log_tick >= pdMS_TO_TICKS(1000)) {
+                        ESP_LOGI(TAG, "EM7028 raw=%u, bpm=%u, valid=%d",
+                                 (unsigned int)g_heart_raw,
+                                 (unsigned int)g_heart_rate_bpm,
+                                 g_heart_rate_valid);
+                        last_heart_log_tick = now_tick;
+                    }
+                    g_sensors_valid = true;
+                } else {
+                    g_heart_rate_valid = false;
+                    ESP_LOGW(TAG, "EM7028读取失败");
+                }
+            }
+
+            if (g_sensors_valid) {
+                update_home_sensors(&guider_ui);
+            }
         }
         
         // 50ms读取一次加速度（步数检测需要较高采样率）
@@ -213,6 +231,8 @@ esp_err_t sensors_start(void)
         err = bmp280_configure(&bmp280_dev, &config);
         if (err != ESP_OK) {
             ESP_LOGW(TAG, "BMP280配置失败: %s", esp_err_to_name(err));
+        } else {
+            g_bmp280_ready = true;
         }
     }
 
@@ -346,9 +366,15 @@ esp_err_t rtc_sync_to_system(void)
         return err;
     }
     
-    // 检查RTC时间是否有效（年份>=24表示2024年及以后）
-    if (rtc_time.year < 24) {
-        ESP_LOGW(TAG, "RTC时间无效 (year=%d)，跳过同步", rtc_time.year);
+    // 还要校验当月天数，避免 mktime 把无效日期自动滚到下个月。
+    static const uint8_t month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int year = 2000 + rtc_time.year;
+    int max_day = month_days[rtc_time.month - 1];
+    if (rtc_time.month == 2 && year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
+        ++max_day;
+    if (rtc_time.year < 24 || rtc_time.day > max_day) {
+        ESP_LOGW(TAG, "RTC日期无效 (%04d-%02u-%02u)，跳过同步",
+                 year, rtc_time.month, rtc_time.day);
         return ESP_ERR_INVALID_STATE;
     }
     

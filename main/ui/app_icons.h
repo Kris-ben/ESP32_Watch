@@ -9,5 +9,6 @@ extern const lv_image_dsc_t app_icon_wifi;
 extern const lv_image_dsc_t app_icon_calendar;
 extern const lv_image_dsc_t app_icon_alarm;
 extern const lv_image_dsc_t app_icon_music;
+extern const lv_image_dsc_t app_icon_timer;
 
 #endif
