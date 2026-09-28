@@ -393,6 +393,13 @@ bool voice_local_intent_try_handle(const char *user_text, char *reply, size_t re
 
         if (extract_percent(user_text, &v)) {
             target = v;
+        } else if (strstr(user_text, "最高") != NULL || strstr(user_text, "最亮") != NULL ||
+                   strstr(user_text, "最大") != NULL) {
+            target = 100;
+        } else if (strstr(user_text, "最低") != NULL || strstr(user_text, "最暗") != NULL ||
+                   strstr(user_text, "最小") != NULL) {
+            // 屏幕驱动保留 5% 作为可见的最低亮度，避免完全熄屏。
+            target = 5;
         } else if (strstr(user_text, "暗") != NULL) {
             target = system_get_brightness() - 20;
         } else if (strstr(user_text, "亮") != NULL) {
