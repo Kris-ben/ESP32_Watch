@@ -5,6 +5,7 @@
 
 #include "guider_customer_fonts.h"
 #include "voice_assistant.h"
+#include "voice_chat_popup.h"
 #include "wifi_connect.h"
 #include "ui_landscape.h"
 
@@ -47,12 +48,12 @@ static const char *state_text(voice_dialog_state_t state)
 static const char *state_hint(voice_dialog_state_t state)
 {
     switch (state) {
-    case VOICE_DIALOG_LISTENING:   return "说“小智小智”开始";
+    case VOICE_DIALOG_LISTENING:   return "说“你好小智”开始";
     case VOICE_DIALOG_WAKEUP:
     case VOICE_DIALOG_RECORDING:   return "说完稍等，我会自动识别";
     case VOICE_DIALOG_RECOGNIZING:
     case VOICE_DIALOG_THINKING:    return "已听到你的问题";
-    case VOICE_DIALOG_SPEAKING:    return "喊“小智”可以打断播报";
+    case VOICE_DIALOG_SPEAKING:    return "喊“你好小智”可以打断播报";
     case VOICE_DIALOG_ERROR:       return "请检查网络后重试";
     default:                       return "正在启动语音助手";
     }
@@ -178,10 +179,25 @@ static void style_dialog_label(lv_obj_t *label, const char *text,
     lv_obj_set_style_text_line_space(label, 2, 0);
 }
 
+static void ai_screen_load_cb(lv_event_t *event)
+{
+    (void)event;
+    voice_chat_popup_ai_screen_entered();
+}
+
+static void ai_screen_unload_cb(lv_event_t *event)
+{
+    (void)event;
+    // 离开 AI 助手页时，结束仍在进行的录音/识别，避免语音任务在后台继续跑。
+    (void)voice_assistant_cancel_current_input();
+}
+
 void ai_status_page_configure(lv_ui *ui)
 {
     if (!ui || !ui->screen_AI) return;
     lv_obj_t *screen = ui->screen_AI;
+    lv_obj_add_event_cb(screen, ai_screen_load_cb, LV_EVENT_SCREEN_LOAD_START, NULL);
+    lv_obj_add_event_cb(screen, ai_screen_unload_cb, LV_EVENT_SCREEN_UNLOAD_START, NULL);
     lv_obj_set_style_bg_color(screen, lv_color_hex(0x0b111b), 0);
     lv_obj_remove_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -300,7 +316,7 @@ void ai_status_page_configure(lv_ui *ui)
     create_caption(transcript, "小智", lv_color_hex(0x61d9cd));
     lv_obj_set_parent(ui->screen_AI_label_ai, transcript);
     style_dialog_label(ui->screen_AI_label_ai,
-                       answer[0] ? answer : "喊小智开始对话",
+                       answer[0] ? answer : "喊你好小智开始对话",
                        lv_color_hex(0x162230));
 
     // 页面重建后旧指针清空，后台语音回调只写当前页面。

@@ -278,8 +278,7 @@ esp_err_t baidu_tts_get_token(baidu_tts_handle_t *handle) {
     
     response[response_len] = '\0';
     
-    // 打印响应内容用于调试（只打印前200字符）
-    ESP_LOGI(TAG, "Token response (%d bytes): %.200s...", response_len, response);
+    ESP_LOGI(TAG, "Token response received (%d bytes)", response_len);
     
     // 直接查找access_token字段（避免完整JSON解析）
     const char *token_start = strstr(response, "\"access_token\":\"");

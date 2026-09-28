@@ -29,7 +29,7 @@ static esp_http_client_handle_t baidu_http_client_init(const char *url,
                                                        esp_http_client_method_t method,
                                                        uint32_t timeout_ms)
 {
-    ESP_LOGI(TAG, "初始化HTTP客户端: %s", url);
+    ESP_LOGI(TAG, "初始化HTTP客户端");
     
     // 限制超时时间，避免长时间等待
     if (timeout_ms > 10000) {
@@ -276,14 +276,26 @@ esp_err_t baidu_asr_get_token(baidu_asr_handle_t *handle)
     return ESP_OK;
 }
 
-esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle, 
-                               const int16_t *audio_data, 
-                               size_t audio_len,
-                               char *result, 
-                               size_t result_size)
+static bool asr_cancel_requested(const volatile bool *cancel_requested)
+{
+    return cancel_requested != NULL &&
+           __atomic_load_n(cancel_requested, __ATOMIC_ACQUIRE);
+}
+
+esp_err_t baidu_asr_recognize_with_cancel(baidu_asr_handle_t *handle,
+                                           const int16_t *audio_data,
+                                           size_t audio_len,
+                                           char *result,
+                                           size_t result_size,
+                                           const volatile bool *cancel_requested)
 {
     if (handle == NULL || audio_data == NULL || result == NULL) {
         return ESP_ERR_INVALID_ARG;
+    }
+
+    if (asr_cancel_requested(cancel_requested)) {
+        result[0] = '\0';
+        return ESP_ERR_INVALID_STATE;
     }
 
     if (audio_len == 0) {
@@ -296,6 +308,10 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
     esp_err_t err = baidu_asr_get_token(handle);
     if (err != ESP_OK) {
         return err;
+    }
+    if (asr_cancel_requested(cancel_requested)) {
+        result[0] = '\0';
+        return ESP_ERR_INVALID_STATE;
     }
 
     size_t used_len = audio_len;
@@ -319,6 +335,9 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
     size_t cur_len = used_len;
 
     for (; cur_len >= 8000; cur_len &= ~((size_t)1), cur_len >>= 1) {
+        if (asr_cancel_requested(cancel_requested)) {
+            return ESP_ERR_INVALID_STATE;
+        }
         size_t base64_len = 0;
         mbedtls_base64_encode(NULL, 0, &base64_len, audio_ptr, cur_len);
 
@@ -374,6 +393,11 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
         return ESP_ERR_NO_MEM;
     }
 
+    if (asr_cancel_requested(cancel_requested)) {
+        free(json_str);
+        return ESP_ERR_INVALID_STATE;
+    }
+
     ESP_LOGI(TAG, "请求JSON长度: %u 字节", (unsigned)json_len);
 
     // 配置HTTP客户端
@@ -411,6 +435,12 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
     const size_t chunk_size = 2048;
     
     while (total_written < json_len) {
+        if (asr_cancel_requested(cancel_requested)) {
+            free(json_str);
+            esp_http_client_close(client);
+            esp_http_client_cleanup(client);
+            return ESP_ERR_INVALID_STATE;
+        }
         size_t to_write = json_len - total_written;
         if (to_write > chunk_size) {
             to_write = chunk_size;
@@ -433,6 +463,12 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
     ESP_LOGI(TAG, "请求发送完成: %u 字节", total_written);
     free(json_str);
 
+    if (asr_cancel_requested(cancel_requested)) {
+        esp_http_client_close(client);
+        esp_http_client_cleanup(client);
+        return ESP_ERR_INVALID_STATE;
+    }
+
     // 读取响应头以确定缓冲区大小（必须在发送完POST数据后进行）
     int content_length = esp_http_client_fetch_headers(client);
     int status_code = esp_http_client_get_status_code(client);
@@ -443,6 +479,12 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
         return ESP_FAIL;
+    }
+
+    if (asr_cancel_requested(cancel_requested)) {
+        esp_http_client_close(client);
+        esp_http_client_cleanup(client);
+        return ESP_ERR_INVALID_STATE;
     }
 
     // 动态缓冲区用于接收响应（连接成功后分配，按需缩小）
@@ -471,6 +513,12 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
     // 读取响应体
     int total_read2 = 0;
     while (1) {
+        if (asr_cancel_requested(cancel_requested)) {
+            free(response_buf2);
+            esp_http_client_close(client);
+            esp_http_client_cleanup(client);
+            return ESP_ERR_INVALID_STATE;
+        }
         // 确保缓冲区足够大
         if (total_read2 + 512 > (int)buf_cap2) {
             // 不再扩容，避免内存峰值
@@ -548,4 +596,14 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
 
     cJSON_Delete(root);
     return ESP_OK;
+}
+
+esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
+                               const int16_t *audio_data,
+                               size_t audio_len,
+                               char *result,
+                               size_t result_size)
+{
+    return baidu_asr_recognize_with_cancel(handle, audio_data, audio_len,
+                                           result, result_size, NULL);
 }

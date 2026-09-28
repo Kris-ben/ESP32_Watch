@@ -1,5 +1,7 @@
 #include "voice_chat_popup.h"
+#include "voice_assistant.h"
 #include "ui_landscape.h"
+#include "gui_guider.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
@@ -9,6 +11,7 @@
 extern SemaphoreHandle_t lvgl_mutex;
 
 static lv_obj_t *s_panel;
+static lv_obj_t *s_backdrop;
 static lv_obj_t *s_bubble;
 static lv_obj_t *s_status;
 static lv_obj_t *s_question;
@@ -18,13 +21,22 @@ static lv_obj_t *s_glint;
 static lv_timer_t *s_glint_timer;
 static int16_t s_glint_x = 12;
 static int8_t s_glint_direction = 1;
-static bool s_dismissed;
+static bool s_suppressed;
+
+static void hide_popup(void)
+{
+    if (!s_panel) return;
+    lv_obj_add_flag(s_panel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(s_backdrop, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(s_bubble, LV_OBJ_FLAG_HIDDEN);
+    lv_timer_pause(s_glint_timer);
+}
 
 static void glint_timer_cb(lv_timer_t *timer)
 {
     (void)timer;
     s_glint_x += s_glint_direction * 5;
-    if (s_glint_x >= 166 || s_glint_x <= 12) {
+    if (s_glint_x >= 142 || s_glint_x <= 10) {
         s_glint_direction = -s_glint_direction;
     }
     lv_obj_set_x(s_glint, ui_landscape_scale_x(s_glint_x));
@@ -37,39 +49,28 @@ static bool ui_lock(void)
 
 static void set_expanded(bool expanded)
 {
-    if (s_dismissed) return;
+    if (s_suppressed) return;
     if (expanded) {
+        lv_obj_remove_flag(s_backdrop, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(s_bubble, LV_OBJ_FLAG_HIDDEN);
         lv_obj_remove_flag(s_panel, LV_OBJ_FLAG_HIDDEN);
         lv_obj_move_foreground(s_panel);
         lv_timer_resume(s_glint_timer);
     } else {
+        lv_obj_add_flag(s_backdrop, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(s_panel, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_remove_flag(s_bubble, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_move_foreground(s_bubble);
+        // 点击空白处后完全隐藏浮窗，不显示 AI 小球；下一次唤醒时再重建显示面板。
+        lv_obj_add_flag(s_bubble, LV_OBJ_FLAG_HIDDEN);
         lv_timer_pause(s_glint_timer);
     }
 }
 
-static void collapse_cb(lv_event_t *event)
+static void backdrop_clicked(lv_event_t *event)
 {
     (void)event;
+    // 点击浮窗外部立即取消本轮录音/对话，回到等待下一次唤醒。
+    (void)voice_assistant_cancel_current_input();
     set_expanded(false);
-}
-
-static void expand_cb(lv_event_t *event)
-{
-    (void)event;
-    set_expanded(true);
-}
-
-static void dismiss_cb(lv_event_t *event)
-{
-    (void)event;
-    s_dismissed = true;
-    lv_obj_add_flag(s_panel, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(s_bubble, LV_OBJ_FLAG_HIDDEN);
-    lv_timer_pause(s_glint_timer);
 }
 
 static lv_obj_t *make_text(lv_obj_t *parent, const char *text, uint32_t color)
@@ -90,9 +91,19 @@ static lv_obj_t *make_text(lv_obj_t *parent, const char *text, uint32_t color)
 static void create_popup(void)
 {
     lv_obj_t *layer = lv_layer_top();
+    s_backdrop = lv_obj_create(layer);
+    lv_obj_set_pos(s_backdrop, 0, 0);
+    lv_obj_set_size(s_backdrop, 284, 240);
+    lv_obj_set_style_bg_opa(s_backdrop, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(s_backdrop, 0, 0);
+    lv_obj_set_style_pad_all(s_backdrop, 0, 0);
+    lv_obj_remove_flag(s_backdrop, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(s_backdrop, backdrop_clicked, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_flag(s_backdrop, LV_OBJ_FLAG_HIDDEN);
+
     s_panel = lv_obj_create(layer);
-    lv_obj_set_pos(s_panel, 10, 42);
-    lv_obj_set_size(s_panel, 220, 196);
+    lv_obj_set_pos(s_panel, 25, 90);
+    lv_obj_set_size(s_panel, 190, 150);
     lv_obj_set_style_radius(s_panel, 14, 0);
     // 半透明冷色底与浅色边线保留页面轮廓，同时保证小屏幕文字对比度。
     lv_obj_set_style_bg_color(s_panel, lv_color_hex(0x29475c), 0);
@@ -136,41 +147,9 @@ static void create_popup(void)
     lv_obj_set_style_text_color(s_status, lv_color_hex(0x65d9e7), 0);
     lv_obj_set_style_text_opa(s_status, LV_OPA_COVER, 0);
 
-    lv_obj_t *collapse = lv_button_create(s_panel);
-    lv_obj_set_pos(collapse, 139, 3);
-    lv_obj_set_size(collapse, 48, 30);
-    lv_obj_set_style_radius(collapse, 8, 0);
-    lv_obj_set_style_bg_color(collapse, lv_color_hex(0x4c7287), 0);
-    lv_obj_set_style_bg_opa(collapse, 90, 0);
-    lv_obj_set_style_border_width(collapse, 1, 0);
-    lv_obj_set_style_border_color(collapse, lv_color_hex(0xa9dbe8), 0);
-    lv_obj_add_event_cb(collapse, collapse_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_t *collapse_text = lv_label_create(collapse);
-    lv_label_set_text(collapse_text, "收起");
-    lv_obj_set_style_text_font(collapse_text, &lv_customer_font_ZiTiQuanWeiJunHeiW22_12, 0);
-    lv_obj_set_style_text_color(collapse_text, lv_color_hex(0xe8f5ff), 0);
-    lv_obj_set_style_text_opa(collapse_text, LV_OPA_COVER, 0);
-    lv_obj_center(collapse_text);
-
-    lv_obj_t *close = lv_button_create(s_panel);
-    lv_obj_set_pos(close, 189, 3);
-    lv_obj_set_size(close, 29, 30);
-    lv_obj_set_style_radius(close, 7, 0);
-    lv_obj_set_style_bg_color(close, lv_color_hex(0x4c7287), 0);
-    lv_obj_set_style_bg_opa(close, 90, 0);
-    lv_obj_set_style_border_width(close, 1, 0);
-    lv_obj_set_style_border_color(close, lv_color_hex(0xa9dbe8), 0);
-    lv_obj_add_event_cb(close, dismiss_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_t *close_text = lv_label_create(close);
-    lv_label_set_text(close_text, LV_SYMBOL_CLOSE);
-    lv_obj_set_style_text_font(close_text, LV_FONT_DEFAULT, 0);
-    lv_obj_set_style_text_color(close_text, lv_color_hex(0xe8f5ff), 0);
-    lv_obj_set_style_text_opa(close_text, LV_OPA_COVER, 0);
-    lv_obj_center(close_text);
-
     s_content = lv_obj_create(s_panel);
-    lv_obj_set_pos(s_content, 9, 38);
-    lv_obj_set_size(s_content, 202, 149);
+    lv_obj_set_pos(s_content, 7, 32);
+    lv_obj_set_size(s_content, 176, 111);
     lv_obj_set_style_radius(s_content, 8, 0);
     lv_obj_set_style_bg_color(s_content, lv_color_hex(0x12273b), 0);
     lv_obj_set_style_bg_opa(s_content, 30, 0);
@@ -189,14 +168,13 @@ static void create_popup(void)
     s_answer = make_text(s_content, "", 0xe0eaf4);
 
     s_bubble = lv_button_create(layer);
-    lv_obj_set_pos(s_bubble, 196, 64);
-    lv_obj_set_size(s_bubble, 38, 38);
+    lv_obj_set_pos(s_bubble, 202, 178);
+    lv_obj_set_size(s_bubble, 32, 32);
     lv_obj_set_style_radius(s_bubble, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(s_bubble, lv_color_hex(0x23678a), 0);
     lv_obj_set_style_bg_opa(s_bubble, 130, 0);
     lv_obj_set_style_border_width(s_bubble, 2, 0);
     lv_obj_set_style_border_color(s_bubble, lv_color_hex(0x72dce9), 0);
-    lv_obj_add_event_cb(s_bubble, expand_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_t *bubble_text = lv_label_create(s_bubble);
     lv_label_set_text(bubble_text, "AI");
     lv_obj_set_style_text_color(bubble_text, lv_color_hex(0xffffff), 0);
@@ -210,12 +188,19 @@ static void create_popup(void)
 void voice_chat_popup_wake(void)
 {
     if (!ui_lock()) return;
+    // 这轮对话从 AI 页开始时，退出 AI 页后也不补弹浮窗。
+    s_suppressed = lv_screen_active() == guider_ui.screen_AI;
+    if (s_suppressed) {
+        hide_popup();
+        xSemaphoreGive(lvgl_mutex);
+        return;
+    }
     if (!s_panel) create_popup();
-    s_dismissed = false;
     lv_label_set_text(s_status, "我在，请说");
     lv_label_set_text(s_question, "等待你说话…");
     lv_label_set_text(s_answer, "");
     lv_obj_scroll_to_y(s_content, 0, LV_ANIM_OFF);
+    // 每次重新唤醒都直接显示完整问答框。
     set_expanded(true);
     xSemaphoreGive(lvgl_mutex);
 }
@@ -223,21 +208,23 @@ void voice_chat_popup_wake(void)
 void voice_chat_popup_listening(void)
 {
     if (!ui_lock()) return;
-    if (s_panel && !s_dismissed) lv_label_set_text(s_status, "正在听");
+    if (s_panel && !s_suppressed) lv_label_set_text(s_status, "正在听");
     xSemaphoreGive(lvgl_mutex);
 }
 
 void voice_chat_popup_thinking(void)
 {
     if (!ui_lock()) return;
-    if (s_panel && !s_dismissed) lv_label_set_text(s_status, "正在思考");
+    if (s_panel && !s_suppressed) lv_label_set_text(s_status, "正在思考");
     xSemaphoreGive(lvgl_mutex);
 }
 
 void voice_chat_popup_question(const char *text)
 {
     if (!ui_lock()) return;
-    if (s_panel && !s_dismissed) {
+    if (s_panel && !s_suppressed) {
+        // 用户可能在等待期间点了浮窗外部；识别到有效问题后重新显示面板。
+        set_expanded(true);
         lv_label_set_text(s_question, text && text[0] ? text : "未识别到内容");
         lv_label_set_text(s_answer, "正在整理回答…");
         lv_obj_scroll_to_y(s_content, 0, LV_ANIM_OFF);
@@ -248,7 +235,7 @@ void voice_chat_popup_question(const char *text)
 void voice_chat_popup_answer(const char *text)
 {
     if (!ui_lock()) return;
-    if (s_panel && !s_dismissed) {
+    if (s_panel && !s_suppressed) {
         lv_label_set_text(s_status, "正在回复");
         lv_label_set_text(s_answer, text && text[0] ? text : "暂无回复");
     }
@@ -258,16 +245,24 @@ void voice_chat_popup_answer(const char *text)
 void voice_chat_popup_replying(void)
 {
     if (!ui_lock()) return;
-    if (s_panel && !s_dismissed) lv_label_set_text(s_status, "正在回复");
+    if (s_panel && !s_suppressed) lv_label_set_text(s_status, "正在回复");
     xSemaphoreGive(lvgl_mutex);
 }
 
 void voice_chat_popup_session_end(void)
 {
     if (!ui_lock()) return;
-    if (s_panel && !s_dismissed) {
-        lv_label_set_text(s_status, "已结束");
-        set_expanded(false);
-    }
+    hide_popup();
     xSemaphoreGive(lvgl_mutex);
+}
+
+void voice_chat_popup_ai_screen_entered(void)
+{
+    s_suppressed = true;
+    hide_popup();
+}
+
+void voice_chat_popup_collapse_for_navigation(void)
+{
+    if (s_panel) set_expanded(false);
 }

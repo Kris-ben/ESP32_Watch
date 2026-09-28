@@ -261,7 +261,7 @@ static void refresh_player(lv_timer_t *timer)
     if (!s_progress) return;
     bool playing = music_player_is_playing();
     bool paused = music_player_is_paused();
-    lv_label_set_text(s_status, playing ? (paused ? "已暂停" : "正在播放") : "播放结束");
+    lv_label_set_text(s_status, paused ? "已暂停" : (playing ? "正在播放" : "播放结束"));
     lv_label_set_text(s_pause, playing && !paused ? LV_SYMBOL_PAUSE : LV_SYMBOL_PLAY);
     if (!s_dragging) lv_slider_set_value(s_progress, music_player_get_progress_percent(), LV_ANIM_OFF);
     uint32_t duration = music_player_get_duration_ms();

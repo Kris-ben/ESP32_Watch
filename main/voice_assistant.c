@@ -258,6 +258,16 @@ bool voice_assistant_is_ready(void)
     return s_ready;
 }
 
+esp_err_t voice_assistant_set_music_playing(bool playing)
+{
+    return s_dialog ? voice_dialog_set_music_playing(s_dialog, playing) : ESP_OK;
+}
+
+esp_err_t voice_assistant_cancel_current_input(void)
+{
+    return s_dialog ? voice_dialog_cancel_current_input(s_dialog) : ESP_OK;
+}
+
 voice_dialog_state_t voice_assistant_get_state(void)
 {
     return voice_dialog_get_state(s_dialog);

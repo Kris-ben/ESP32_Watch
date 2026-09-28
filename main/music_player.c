@@ -6,11 +6,14 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/idf_additions.h"
 #include "freertos/semphr.h"
 #include "esp_log.h"
+#include "esp_heap_caps.h"
 #include "sd_card_fs.h"
 #include "audio_decoder/music_codec.h"
 #include "max98357a.h"
+#include "voice_assistant.h"
 
 static const char *TAG = "MUSIC_PLAYER";
 
@@ -22,9 +25,12 @@ typedef struct {
     uint8_t progress_percent;
     bool playing;
     bool paused;
+    bool pause_requested;
     bool stop_requested;
+    bool restart_pending;
     uint32_t duration_ms;
     uint32_t played_ms;
+    uint32_t resume_ms;
     uint8_t seek_request_percent;
     bool seek_pending;
     TaskHandle_t task;
@@ -37,9 +43,12 @@ static music_player_state_t g_state = {
     .progress_percent = 0,
     .playing = false,
     .paused = false,
+    .pause_requested = false,
     .stop_requested = false,
+    .restart_pending = false,
     .duration_ms = 0,
     .played_ms = 0,
+    .resume_ms = 0,
     .seek_request_percent = 0,
     .seek_pending = false,
     .task = NULL,
@@ -61,16 +70,6 @@ static void ensure_lock(void)
 {
     if (g_state.lock == NULL) {
         g_state.lock = xSemaphoreCreateMutex();
-    }
-}
-
-static void set_playing_state(bool playing, bool paused)
-{
-    ensure_lock();
-    if (xSemaphoreTake(g_state.lock, pdMS_TO_TICKS(50)) == pdTRUE) {
-        g_state.playing = playing;
-        g_state.paused = paused;
-        xSemaphoreGive(g_state.lock);
     }
 }
 
@@ -172,13 +171,38 @@ static esp_err_t playback_pcm_cb(const int16_t *pcm_interleaved,
     return ESP_OK;
 }
 
+static void finish_player_task(esp_err_t result)
+{
+    bool resume_voice = false;
+    if (xSemaphoreTake(g_state.lock, portMAX_DELAY) == pdTRUE) {
+        g_state.playing = false;
+        bool was_paused = g_state.pause_requested && !g_state.restart_pending &&
+                         result == ESP_ERR_INVALID_STATE;
+        g_state.paused = was_paused;
+        g_state.pause_requested = false;
+        g_state.stop_requested = false;
+        if (result == ESP_OK) {
+            g_state.progress_percent = 100;
+            g_state.seek_request_percent = 0;
+            g_state.resume_ms = 0;
+        } else if (!was_paused && !g_state.restart_pending) {
+            g_state.resume_ms = 0;
+        }
+        g_state.task = NULL;
+        resume_voice = !g_state.restart_pending;
+        xSemaphoreGive(g_state.lock);
+    }
+    if (resume_voice) (void)voice_assistant_set_music_playing(false);
+    vTaskDeleteWithCaps(NULL);
+}
+
 static void player_task(void *arg)
 {
     (void)arg;
 
     char file_path[SD_MUSIC_NAME_MAX + sizeof(SD_MOUNT_POINT)] = {0};
     uint32_t duration_ms = 0;
-    uint8_t seek_percent = 0;
+    uint32_t resume_ms = 0;
 
     ensure_lock();
     if (xSemaphoreTake(g_state.lock, pdMS_TO_TICKS(100)) == pdTRUE) {
@@ -187,9 +211,9 @@ static void player_task(void *arg)
         g_state.playing = true;
         g_state.paused = false;
         g_state.progress_percent = 0;
+        resume_ms = g_state.resume_ms;
         g_state.played_ms = 0;
         g_state.duration_ms = 0;
-        seek_percent = g_state.seek_request_percent;
         g_state.seek_pending = false;
         xSemaphoreGive(g_state.lock);
     }
@@ -197,9 +221,7 @@ static void player_task(void *arg)
     max98357a_handle_t **pp_handle = get_audio_handle();
     if (!pp_handle || !*pp_handle || file_path[0] == '\0') {
         ESP_LOGE(TAG, "音频句柄或文件无效");
-        set_playing_state(false, false);
-        g_state.task = NULL;
-        vTaskDelete(NULL);
+        finish_player_task(ESP_ERR_INVALID_STATE);
         return;
     }
 
@@ -217,7 +239,7 @@ static void player_task(void *arg)
         .sample_rate = 0,
         .mix_buffer = NULL,
         .mix_buffer_samples = 0,
-        .skip_ms = (duration_ms > 0) ? (uint32_t)((duration_ms * seek_percent) / 100U) : 0,
+        .skip_ms = resume_ms,
         .chunks_since_yield = 0,
     };
 
@@ -228,18 +250,7 @@ static void player_task(void *arg)
 
     free(ctx.mix_buffer);
 
-    if (xSemaphoreTake(g_state.lock, pdMS_TO_TICKS(50)) == pdTRUE) {
-        g_state.playing = false;
-        g_state.paused = false;
-        g_state.stop_requested = false;
-        if (ret == ESP_OK) {
-            g_state.progress_percent = 100;
-        }
-        g_state.task = NULL;
-        xSemaphoreGive(g_state.lock);
-    }
-
-    vTaskDelete(NULL);
+    finish_player_task(ret);
 }
 
 esp_err_t music_player_set_selected_file(const char *filename)
@@ -257,6 +268,9 @@ esp_err_t music_player_set_selected_file(const char *filename)
         snprintf(g_state.selected_file, sizeof(g_state.selected_file), SD_MOUNT_POINT "/%s", filename);
     }
     g_state.selected_file[sizeof(g_state.selected_file) - 1] = '\0';
+    g_state.seek_request_percent = 0;
+    g_state.resume_ms = 0;
+    g_state.paused = false;
     xSemaphoreGive(g_state.lock);
 
     return ESP_OK;
@@ -300,12 +314,19 @@ esp_err_t music_player_play_selected(void)
         return ESP_ERR_INVALID_STATE;
     }
 
+    // 换歌期间保持语音监听暂停，避免唤醒模型抢回播放器所需的内部 RAM。
+    if (xSemaphoreTake(g_state.lock, portMAX_DELAY) == pdTRUE) {
+        g_state.restart_pending = true;
+        g_state.pause_requested = false;
+        xSemaphoreGive(g_state.lock);
+    }
     music_player_stop();
 
     if (xSemaphoreTake(g_state.lock, pdMS_TO_TICKS(100)) != pdTRUE) {
         return ESP_ERR_TIMEOUT;
     }
     if (g_state.task != NULL) {
+        g_state.restart_pending = false;
         xSemaphoreGive(g_state.lock);
         return ESP_ERR_TIMEOUT;
     }
@@ -315,7 +336,30 @@ esp_err_t music_player_play_selected(void)
     g_state.duration_ms = 0;
     xSemaphoreGive(g_state.lock);
 
-    BaseType_t ok = xTaskCreate(player_task, "music_player", 8192, NULL, 3, &g_state.task);
+    esp_err_t pause_err = voice_assistant_set_music_playing(true);
+    if (pause_err != ESP_OK) {
+        if (xSemaphoreTake(g_state.lock, portMAX_DELAY) == pdTRUE) {
+            g_state.restart_pending = false;
+            xSemaphoreGive(g_state.lock);
+        }
+        (void)voice_assistant_set_music_playing(false);
+        return pause_err;
+    }
+
+    BaseType_t ok = xTaskCreateWithCaps(player_task, "music_player", 8192, NULL, 3,
+                                        &g_state.task, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+    if (ok != pdPASS) {
+        ESP_LOGE(TAG, "创建播放任务失败: 内部最大连续空块 %u 字节",
+                 (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
+    }
+    bool no_task = false;
+    if (xSemaphoreTake(g_state.lock, portMAX_DELAY) == pdTRUE) {
+        if (ok != pdPASS) g_state.task = NULL;
+        g_state.restart_pending = false;
+        no_task = (g_state.task == NULL);
+        xSemaphoreGive(g_state.lock);
+    }
+    if (no_task) (void)voice_assistant_set_music_playing(false);
     return ok == pdPASS ? ESP_OK : ESP_FAIL;
 }
 
@@ -333,9 +377,20 @@ static void music_control_task(void *arg)
 
 esp_err_t music_player_request_play_selected(void)
 {
+    ensure_lock();
+    if (xSemaphoreTake(g_state.lock, portMAX_DELAY) == pdTRUE) {
+        g_state.restart_pending = true;
+        g_state.pause_requested = false;
+        xSemaphoreGive(g_state.lock);
+    }
     if (!s_control_task) {
         if (xTaskCreate(music_control_task, "music_control", 3072, NULL, 3,
                         &s_control_task) != pdPASS) {
+            if (xSemaphoreTake(g_state.lock, portMAX_DELAY) == pdTRUE) {
+                g_state.restart_pending = false;
+                xSemaphoreGive(g_state.lock);
+            }
+            ESP_LOGE(TAG, "创建音乐控制任务失败");
             return ESP_ERR_NO_MEM;
         }
     }
@@ -355,7 +410,12 @@ esp_err_t music_player_toggle_pause(void)
         return music_player_request_play_selected();
     }
 
-    g_state.paused = !g_state.paused;
+    // 暂停时让解码任务退出，释放内存并恢复语音唤醒；进度留给下一次播放。
+    g_state.resume_ms = g_state.played_ms;
+    g_state.seek_request_percent = g_state.duration_ms > 0
+        ? (uint8_t)((g_state.resume_ms * 100ULL) / g_state.duration_ms) : 0;
+    g_state.pause_requested = true;
+    g_state.stop_requested = true;
     xSemaphoreGive(g_state.lock);
     return ESP_OK;
 }
@@ -420,6 +480,8 @@ esp_err_t music_player_seek_percent(uint8_t percent)
     }
 
     g_state.seek_request_percent = percent;
+    g_state.resume_ms = g_state.duration_ms > 0
+        ? (uint32_t)((g_state.duration_ms * percent) / 100U) : 0;
     g_state.seek_pending = true;
     xSemaphoreGive(g_state.lock);
 

@@ -7,6 +7,9 @@
 #include "esp_log.h"
 #include "system_settings.h"
 #include "alarm_clock.h"
+#include "ui/alarm_list_page.h"
+#include "ui/time_tools_page.h"
+#include "ui/voice_chat_popup.h"
 #include "weather.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
@@ -263,6 +266,10 @@ static esp_err_t cmd_set_volume(uint8_t value)
 
 static esp_err_t cmd_set_alarm(uint8_t index, uint8_t hour, uint8_t minute, bool enabled)
 {
+    if (index >= ALARM_COUNT || hour > 23 || minute > 59) {
+        ESP_LOGW(TAG, "闹钟参数越界: index=%u %02u:%02u", index, hour, minute);
+        return ESP_ERR_INVALID_ARG;
+    }
     ESP_LOGI(TAG, "设置闹钟%d: %02d:%02d %s", index, hour, minute, enabled ? "启用" : "禁用");
     
     esp_err_t ret = alarm_set_time(index, hour, minute);
@@ -273,8 +280,7 @@ static esp_err_t cmd_set_alarm(uint8_t index, uint8_t hour, uint8_t minute, bool
     // 更新UI显示
     if (g_ui && lvgl_mutex) {
         if (xSemaphoreTake(lvgl_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
-            // 调用闹钟模块的UI更新函数
-            alarm_update_ui(g_ui);
+            alarm_list_page_refresh(g_ui);
             xSemaphoreGive(lvgl_mutex);
         }
     }
@@ -291,20 +297,7 @@ static esp_err_t cmd_enable_alarm(uint8_t index, bool enabled)
     // 更新开关UI
     if (g_ui && lvgl_mutex) {
         if (xSemaphoreTake(lvgl_mutex, pdMS_TO_TICKS(100)) == pdTRUE) {
-            lv_obj_t *sw = NULL;
-            switch (index) {
-                case 0: sw = g_ui->screen_clock_sw_1; break;
-                case 1: sw = g_ui->screen_clock_sw_2; break;
-                case 2: sw = g_ui->screen_clock_sw_3; break;
-                case 3: sw = g_ui->screen_clock_sw_4; break;
-            }
-            if (sw && lv_obj_is_valid(sw)) {
-                if (enabled) {
-                    lv_obj_add_state(sw, LV_STATE_CHECKED);
-                } else {
-                    lv_obj_remove_state(sw, LV_STATE_CHECKED);
-                }
-            }
+            alarm_list_page_refresh(g_ui);
             xSemaphoreGive(lvgl_mutex);
         }
     }
@@ -335,6 +328,13 @@ static esp_err_t cmd_switch_screen(const char *name)
     if (!g_ui || !lvgl_mutex) return ESP_ERR_INVALID_STATE;
     ESP_LOGI(TAG, "切换到界面: %s", name);
     if (xSemaphoreTake(lvgl_mutex, pdMS_TO_TICKS(200)) != pdTRUE) return ESP_ERR_TIMEOUT;
+
+    if (strcmp(name, "timer") == 0 || strcmp(name, "stopwatch") == 0) {
+        time_tools_page_open();
+        voice_chat_popup_collapse_for_navigation();
+        xSemaphoreGive(lvgl_mutex);
+        return ESP_OK;
+    }
 
     lv_obj_t **target = NULL;
     bool *target_deleted = NULL;
@@ -377,6 +377,7 @@ static esp_err_t cmd_switch_screen(const char *name)
     bool *old_deleted = screen_deleted_flag(g_ui, active);
     ui_load_scr_animation(g_ui, target, *target_deleted, old_deleted ? old_deleted : &unused_deleted,
                           setup, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, false, true);
+    voice_chat_popup_collapse_for_navigation();
     xSemaphoreGive(lvgl_mutex);
     return ESP_OK;
 }
@@ -421,7 +422,7 @@ int ai_command_get_system_prompt(char *buffer, size_t max_len)
         "- [CMD:VOLUME:0-100] 设置音量\n"
         "- [CMD:ALARM:索引:时:分:ON/OFF] 设置闹钟(索引0-3)\n"
         "- [CMD:ALARM:索引:ON/OFF] 开关闹钟\n"
-        "- [CMD:SCREEN:界面名] 切换界面(home/weather/wifi/clock/ai/settings/music/calendar)\n"
+        "- [CMD:SCREEN:界面名] 切换界面(home/weather/wifi/clock/ai/settings/music/calendar/timer)\n"
         "\n当前状态: 亮度%d%%, 音量%d%%, %s\n"
         "用户说中文时请用中文回复，执行控制时先确认再在末尾添加指令。",
         brightness, volume, alarm_info);

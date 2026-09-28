@@ -72,7 +72,7 @@ esp_err_t ai_command_init(lv_ui *ui);
 /**
  * @brief 解析并执行AI回复中的指令
  * @param response AI回复文本
- * @param clean_response 输出去除指令后的纯文本回复（可为NULL）
+ * @param clean_response 输出去除指令后的纯文本回复（可为NULL，也可以与response指向同一缓冲区）
  * @param max_len clean_response缓冲区大小
  * @return 执行的指令数量
  */

@@ -1,4 +1,4 @@
-"""Render the six pinned Phosphor duotone SVGs into LVGL RGB565A8 assets.
+"""Render the pinned Phosphor duotone SVGs into LVGL RGB565A8 assets.
 
 Requires PySide6. This script is only needed when regenerating the assets;
 the firmware build uses the checked-in C file and works offline.
@@ -23,6 +23,7 @@ ICONS = (
     ("calendar", "calendar-dots", "#83dfb6"),
     ("alarm", "alarm", "#ff9eb6"),
     ("music", "music-notes", "#87d8ed"),
+    ("timer", "hourglass-medium", "#ffca78"),
 )
 
 

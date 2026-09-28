@@ -41,6 +41,12 @@ void voice_assistant_trigger(void);
  */
 bool voice_assistant_is_ready(void);
 
+/** @brief 暂停或恢复语音监听；暂停时等待唤醒模型释放。 */
+esp_err_t voice_assistant_set_music_playing(bool playing);
+
+/** @brief 取消当前录音/对话，返回等待下一次唤醒。 */
+esp_err_t voice_assistant_cancel_current_input(void);
+
 /** @brief 当前语音流程状态，供屏幕状态页显示。 */
 voice_dialog_state_t voice_assistant_get_state(void);
 

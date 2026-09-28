@@ -6,6 +6,37 @@
 #include "alarm_clock.h"
 #include "guider_customer_fonts.h"
 
+static lv_obj_t *s_screen;
+static lv_obj_t *s_time_labels[ALARM_COUNT];
+static lv_obj_t *s_toggles[ALARM_COUNT];
+
+static void alarm_screen_deleted(lv_event_t *event)
+{
+    if (lv_event_get_target_obj(event) != s_screen) return;
+    s_screen = NULL;
+    for (int i = 0; i < ALARM_COUNT; ++i) {
+        s_time_labels[i] = NULL;
+        s_toggles[i] = NULL;
+    }
+}
+
+void alarm_list_page_refresh(lv_ui *ui)
+{
+    if (!ui || s_screen != ui->screen_clock || !lv_obj_is_valid(s_screen)) return;
+    for (int i = 0; i < ALARM_COUNT; ++i) {
+        uint8_t hour = 0;
+        uint8_t minute = 0;
+        if (alarm_get_time(i, &hour, &minute) != ESP_OK) continue;
+        // 语音任务可能在页面切换动画期间触发刷新；旧页面对象已经失效时必须跳过。
+        if (s_time_labels[i] && lv_obj_is_valid(s_time_labels[i])) {
+            lv_label_set_text_fmt(s_time_labels[i], "%02u:%02u", hour, minute);
+        }
+        if (!s_toggles[i] || !lv_obj_is_valid(s_toggles[i])) continue;
+        if (alarm_is_enabled(i)) lv_obj_add_state(s_toggles[i], LV_STATE_CHECKED);
+        else lv_obj_remove_state(s_toggles[i], LV_STATE_CHECKED);
+    }
+}
+
 static void edit_alarm_cb(lv_event_t *event)
 {
     int index = (int)(intptr_t)lv_event_get_user_data(event);
@@ -58,6 +89,7 @@ static void make_alarm_row(lv_obj_t *screen, int index)
     lv_obj_t *time = lv_label_create(time_area);
     lv_obj_set_pos(time, 12, 25);
     lv_label_set_text_fmt(time, "%02u:%02u", hour, minute);
+    s_time_labels[index] = time;
     lv_obj_set_style_text_font(time, &lv_font_ZiTiQuanWeiJunHeiW22_24, 0);
     lv_obj_set_style_text_color(time, lv_color_hex(0xffffff), 0);
 
@@ -73,6 +105,7 @@ static void make_alarm_row(lv_obj_t *screen, int index)
     lv_obj_set_style_bg_color(toggle, lv_color_hex(0xffffff), LV_PART_KNOB);
     lv_obj_set_style_bg_opa(toggle, LV_OPA_COVER, LV_PART_KNOB);
     if (alarm_is_enabled(index)) lv_obj_add_state(toggle, LV_STATE_CHECKED);
+    s_toggles[index] = toggle;
     lv_obj_add_event_cb(toggle, toggle_alarm_cb, LV_EVENT_VALUE_CHANGED,
                         (void *)(intptr_t)index);
 }
@@ -80,6 +113,8 @@ static void make_alarm_row(lv_obj_t *screen, int index)
 void alarm_list_page_init(lv_ui *ui)
 {
     if (!ui || !ui->screen_clock) return;
+    s_screen = ui->screen_clock;
+    lv_obj_add_event_cb(s_screen, alarm_screen_deleted, LV_EVENT_DELETE, NULL);
 
     lv_obj_add_flag(ui->screen_clock_list_clock, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui->screen_clock_sw_1, LV_OBJ_FLAG_HIDDEN);

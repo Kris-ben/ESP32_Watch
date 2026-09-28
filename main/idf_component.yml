@@ -6,3 +6,4 @@ dependencies:
   # LVGL 库
   lvgl/lvgl: "==9.4.0"
   espressif/esp_lvgl_port: "==2.7.0"
+  espressif/esp-sr: "==2.4.7"

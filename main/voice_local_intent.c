@@ -236,8 +236,8 @@ static bool finish(const char *text, char *reply, size_t reply_len)
 /**
  * @brief 执行一条 ai_command 指令（复用工程里已有的执行逻辑）
  */
-static void exec_command(ai_cmd_type_t type, int value, const char *screen_name,
-                         int alarm_index, int alarm_hour, int alarm_minute)
+static esp_err_t exec_command(ai_cmd_type_t type, int value, const char *screen_name,
+                              int alarm_index, int alarm_hour, int alarm_minute)
 {
     ai_command_t cmd;
     memset(&cmd, 0, sizeof(cmd));
@@ -261,13 +261,14 @@ static void exec_command(ai_cmd_type_t type, int value, const char *screen_name,
         cmd.params.alarm.enabled = true;
         break;
     default:
-        return;
+        return ESP_ERR_INVALID_ARG;
     }
 
     esp_err_t err = ai_command_execute(&cmd);
     if (err != ESP_OK) {
         ESP_LOGW(TAG, "指令执行失败(%d): %s", (int)type, esp_err_to_name(err));
     }
+    return err;
 }
 
 bool voice_local_intent_try_handle(const char *user_text, char *reply, size_t reply_len)
@@ -286,6 +287,12 @@ bool voice_local_intent_try_handle(const char *user_text, char *reply, size_t re
         { "音乐",   "music"    },
         { "天气",   "weather"  },
         { "日历",   "calendar" },
+        { "AI助手", "ai"       },
+        { "语音助手", "ai"     },
+        { "小智",   "ai"       },
+        { "计时",   "timer"    },
+        { "倒计时", "timer"    },
+        { "秒表",   "timer"    },
         { "闹钟",   "clock"    },
         { "时钟",   "clock"    },
         { "设置",   "settings" },
@@ -300,7 +307,9 @@ bool voice_local_intent_try_handle(const char *user_text, char *reply, size_t re
         strstr(user_text, "进入") != NULL) {
         for (size_t i = 0; i < sizeof(scr_map) / sizeof(scr_map[0]); i++) {
             if (strstr(user_text, scr_map[i].kw) != NULL) {
-                exec_command(AI_CMD_SCREEN, 0, scr_map[i].name, 0, 0, 0);
+                if (exec_command(AI_CMD_SCREEN, 0, scr_map[i].name, 0, 0, 0) != ESP_OK) {
+                    return finish("界面暂时没切过去，请再试一次。", reply, reply_len);
+                }
                 snprintf(buf, sizeof(buf), "好的，已经切换到%s。", scr_map[i].kw);
                 return finish(buf, reply, reply_len);
             }
@@ -406,7 +415,7 @@ bool voice_local_intent_try_handle(const char *user_text, char *reply, size_t re
         int h = 0;
         int m = 0;
         if (!extract_clock_time(user_text, &h, &m)) {
-            return false;   // 没听清时间，交给大模型追问
+            return finish("没听清闹钟时间，请说几时几分。", reply, reply_len);
         }
 
         // 优先占用一个还没启用的闹钟位；都满了就覆盖 0 号
@@ -421,8 +430,10 @@ bool voice_local_intent_try_handle(const char *user_text, char *reply, size_t re
             slot = 0;
         }
 
-        exec_command(AI_CMD_ALARM_SET, 0, NULL, slot, h, m);
-        snprintf(buf, sizeof(buf), "好的，闹钟已经设在%d点%d分。", h, m);
+        if (exec_command(AI_CMD_ALARM_SET, 0, NULL, slot, h, m) != ESP_OK) {
+            return finish("闹钟设置失败，请再试一次。", reply, reply_len);
+        }
+        snprintf(buf, sizeof(buf), "好的，闹钟%d已经设在%d点%d分。", slot + 1, h, m);
         return finish(buf, reply, reply_len);
     }
 

@@ -3,7 +3,7 @@
  * @brief 语音对话管理模块
  * 
  * 功能：
- * - 持续监听唤醒词"你好小智"
+ * - 在设备上持续监听唤醒词"你好小智"
  * - 唤醒后录制用户语音并识别
  * - 将识别结果发送给AI大模型
  * - AI回复通过TTS播放
@@ -17,7 +17,7 @@
  * 5. 调用百度ASR进行语音识别
  * 6. 将识别文本发送给Spark大模型
  * 7. 接收AI回复并通过TTS播放
- * 8. 播报中可喊“小智”打断；空闲超时后恢复唤醒词监听
+ * 8. 播报中可喊“你好小智”打断；空闲超时后恢复唤醒词监听
  * 
  * 资源管理策略：
  * - PDM麦克风使用I2S_NUM_0
@@ -198,7 +198,10 @@ voice_dialog_config_t voice_dialog_get_default_config(void);
  * @param handle 句柄
  * @param playing 是否正在播放音乐
  */
-void voice_dialog_set_music_playing(voice_dialog_handle_t handle, bool playing);
+esp_err_t voice_dialog_set_music_playing(voice_dialog_handle_t handle, bool playing);
+
+/** @brief 取消当前录音/对话，返回等待下一次唤醒。 */
+esp_err_t voice_dialog_cancel_current_input(voice_dialog_handle_t handle);
 
 /**
  * @brief 设置跳过AI回复的TTS播放

@@ -92,6 +92,19 @@ esp_err_t baidu_asr_recognize(baidu_asr_handle_t *handle,
                                char *result, 
                                size_t result_size);
 
+/**
+ * @brief 可取消的语音识别
+ *
+ * cancel_requested 非 NULL 时，驱动会在网络请求的分段操作之间检查它。
+ * 当前阻塞的网络调用返回后会立即清理连接并返回 ESP_ERR_INVALID_STATE。
+ */
+esp_err_t baidu_asr_recognize_with_cancel(baidu_asr_handle_t *handle,
+                                           const int16_t *audio_data,
+                                           size_t audio_len,
+                                           char *result,
+                                           size_t result_size,
+                                           const volatile bool *cancel_requested);
+
 #ifdef __cplusplus
 }
 #endif
