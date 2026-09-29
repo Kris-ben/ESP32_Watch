@@ -8,6 +8,8 @@
 | --- | --- | --- |
 | <img src="docs/images/watch-device-overview.png" alt="智能手表开发板和交互界面" width="220"> | <img src="docs/images/watch-voice-assistant.png" alt="语音助手识别界面" width="220"> | <img src="docs/images/watch-alarms.png" alt="四组闹钟列表" width="220"> |
 
+[观看小智语音助手演示视频（约 1 分 34 秒）](docs/videos/xiaozhi-demo.mp4)
+
 ## 已实现功能
 
 | 模块 | 功能 |
