@@ -45,8 +45,9 @@ static void wifi_scan_done_callback(int numbers, wifi_ap_record_t *ap_records)
 {
     ESP_LOGI(TAG, "扫描完成，发现 %d 个WiFi", numbers);
     extern SemaphoreHandle_t lvgl_mutex;
-    if (!lvgl_mutex || xSemaphoreTake(lvgl_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
-        ESP_LOGW(TAG, "扫描完成但界面忙，跳过本次更新");
+    // 后台扫描任务等待界面锁，避免界面暂时忙时丢掉唯一的完成通知。
+    if (!lvgl_mutex || xSemaphoreTake(lvgl_mutex, portMAX_DELAY) != pdTRUE) {
+        ESP_LOGE(TAG, "扫描完成但界面锁不可用，无法显示结果");
         return;
     }
 

@@ -73,8 +73,14 @@ static void event_handler(void* arg, esp_event_base_t event_base,int32_t event_i
         {
             wifi_mode_t mode;
             esp_wifi_get_mode(&mode);
-            if(mode == WIFI_MODE_STA)
-                esp_wifi_connect();         //启动WIFI连接
+            if(mode == WIFI_MODE_STA) {
+                if (scan_in_progress) {
+                    // 扫描为先；扫描结束后再恢复连接，避免启动事件抢占扫描。
+                    scan_reconnect_needed = true;
+                } else {
+                    esp_wifi_connect();
+                }
+            }
             break;
         }
         case WIFI_EVENT_STA_CONNECTED:  //WIFI连上路由器后，触发此事件
@@ -133,6 +139,8 @@ static void event_handler(void* arg, esp_event_base_t event_base,int32_t event_i
         {
             case IP_EVENT_STA_GOT_IP:           //只有获取到路由器分配的IP，才认为是连上了路由器
                 ESP_LOGI(TAG,"Get ip address");
+                // 只累计连续失败次数，连接成功后给下一次掉线恢复重试额度。
+                sta_connect_count = 0;
                 is_sta_connected = true;
                 if(wifi_state_cb)
                     wifi_state_cb(WIFI_STATE_CONNECTED);
@@ -239,13 +247,21 @@ static void scan_task(void* param)
     }
 
     esp_err_t err = esp_wifi_scan_start(NULL, true);
-    if (err == ESP_ERR_WIFI_STATE) {
-        // 正在连接热点时，IDF会拒绝扫描；暂停这次连接再重试扫描。
-        esp_err_t disconnect_err = esp_wifi_disconnect();
-        if (disconnect_err == ESP_OK) scan_reconnect_needed = true;
-        for (int retry = 0; retry < 10 && err == ESP_ERR_WIFI_STATE; retry++) {
-            vTaskDelay(pdMS_TO_TICKS(100));
+    if (err == ESP_ERR_WIFI_STATE || err == ESP_ERR_WIFI_NOT_STARTED) {
+        // 连接占用时先停止；上次启动失败留下的停止状态也允许重新扫描。
+        ESP_LOGW(TAG, "wifi scan needs recovery: %s", esp_err_to_name(err));
+        scan_reconnect_needed = true;
+        esp_err_t restart_err = ESP_OK;
+        if (err == ESP_ERR_WIFI_STATE) {
+            restart_err = esp_wifi_stop();
+        }
+        if (restart_err == ESP_OK || restart_err == ESP_ERR_WIFI_NOT_STARTED) {
+            restart_err = esp_wifi_start();
+        }
+        if (restart_err == ESP_OK) {
             err = esp_wifi_scan_start(NULL, true);
+        } else {
+            err = restart_err;
         }
     }
     if (err == ESP_OK) {
