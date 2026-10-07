@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ESP32-S3 智能手表小智语音助手演示视频">
+  <title>小智语音助手演示 · ESP32-S3 智能手表</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: #f4f5f8; background: #101219; }
+    main { width: min(960px, calc(100% - 32px)); margin: 0 auto; padding: clamp(32px, 7vw, 72px) 0; }
+    a { color: #96c5ff; }
+    .back { display: inline-block; margin-bottom: 28px; text-decoration: none; }
+    h1 { margin: 0 0 10px; font-size: clamp(28px, 5vw, 44px); line-height: 1.2; }
+    p { color: #bac0cd; line-height: 1.6; }
+    .player { overflow: hidden; margin-top: 28px; border: 1px solid #343a49; border-radius: 18px; background: #000; }
+    video { display: block; width: 100%; max-height: 75vh; }
+    .note { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="https://github.com/Kris-ben/ESP32_Watch">← 返回手表项目</a>
+    <h1>小智语音助手演示</h1>
+    <p>ESP32-S3 智能手表 · 约 1 分 34 秒</p>
+    <div class="player">
+      <video controls playsinline preload="metadata" poster="./images/watch-voice-assistant.png" aria-label="小智语音助手演示视频">
+        <source src="./videos/xiaozhi-demo.mp4" type="video/mp4">
+        你的浏览器暂不支持视频播放。<a href="./videos/xiaozhi-demo.mp4">打开视频文件</a>。
+      </video>
+    </div>
+    <p class="note">如果播放缓慢，请稍等视频加载，或<a href="./videos/xiaozhi-demo.mp4" download>下载视频</a>观看。</p>
+  </main>
+</body>
+</html>
